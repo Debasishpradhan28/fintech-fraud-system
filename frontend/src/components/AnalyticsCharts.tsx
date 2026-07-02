@@ -17,11 +17,6 @@ function AnalyticsCharts({
   topUsers
 }: any) {
 
-  const COLORS = [
-    "#22c55e",
-    "#f59e0b",
-    "#ef4444"
-  ];
 
   return (
 

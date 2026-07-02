@@ -1,6 +1,5 @@
 import {
-    FaArrowDown,
-    FaArrowRight
+    FaArrowDown
 } from "react-icons/fa";
 
 interface Props{

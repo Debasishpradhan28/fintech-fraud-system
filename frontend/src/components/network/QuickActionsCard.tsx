@@ -13,10 +13,7 @@ selectedNode:any;
 
 }
 
-function QuickActionsCard({
-
-selectedNode
-
+function QuickActionsCard({  
 }:Props){
 
 return(

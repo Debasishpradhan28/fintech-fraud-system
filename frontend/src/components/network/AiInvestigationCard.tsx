@@ -1,7 +1,5 @@
 import {
 FaRobot,
-FaCheckCircle,
-FaExclamationTriangle,
 FaShieldAlt,
 FaLock,
 FaEye

@@ -1,8 +1,3 @@
-import {
-    FaHistory,
-    FaCircle
-} from "react-icons/fa";
-
 interface Props{
 
     timeline:any[];

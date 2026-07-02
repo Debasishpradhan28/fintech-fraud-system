@@ -1,6 +1,6 @@
 import {useEffect,useState } from "react";
 import Layout from "../components/Layout";
-import PageHeader from "../components/PageHeader";
+// import PageHeader from "../components/PageHeader";
 import FraudNetworkGraph from "../components/FraudNetworkGraph";
 import api from "../services/api";
 import { useParams } from "react-router-dom";
@@ -25,13 +25,13 @@ function NetworkGraph(){
 const [account, setAccount] = useState<any>(null);
 const [metrics, setMetrics] = useState<any>(null);
 const [timeline, setTimeline] = useState<any[]>([]);
-const [patterns, setPatterns] = useState<any[]>([]);
-const [recommendations, setRecommendations] = useState<any[]>([]);
-const [aiSummary, setAiSummary] = useState("");
+// const [patterns, setPatterns] = useState<any[]>([]);
+// const [recommendations, setRecommendations] = useState<any[]>([]);
+// const [aiSummary, setAiSummary] = useState("");
 const [selectedNode, setSelectedNode] = useState<any>(null);
-const [search, setSearch] = useState("");
-const [filter, setFilter] = useState("ALL");
-const [filterOpen, setFilterOpen] = useState(false);
+// const [search, setSearch] = useState("");
+// const [filter, setFilter] = useState("ALL");
+// const [filterOpen, setFilterOpen] = useState(false);
 const { id } = useParams();
 const graphRef = useRef<any>(null);
  const fetchNetwork = async () => {
@@ -60,13 +60,13 @@ console.log("Started Fetch");
   setAccount(data.account);
   setMetrics(data.metrics);
   setTimeline(data.timeline);
-  setPatterns(data.patterns);
-  setRecommendations(
-   data.recommendations
-  );
-  setAiSummary(
-   data.aiSummary
-  );
+//   setPatterns(data.patterns);
+//   setRecommendations(
+//    data.recommendations
+//   );
+//   setAiSummary(
+//    data.aiSummary
+//   );
 console.log(response.data);
  }catch(error){
   console.log(error);

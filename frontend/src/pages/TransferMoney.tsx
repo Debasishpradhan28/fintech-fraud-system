@@ -1,20 +1,15 @@
 import {
-    useEffect,
- useState
-}
-from "react";
+  useEffect,
+  useState
+} from "react";
 
-import Layout
-from "../components/Layout";
+import Layout from "../components/Layout";
 
-import PageHeader
-from "../components/PageHeader";
+import PageHeader from "../components/PageHeader";
 import api from "../services/api";
 import {
- useLocation
-}
-from
-"react-router-dom";
+  useLocation
+} from "react-router-dom";
 
 function TransferMoney(){
   const [
@@ -192,19 +187,19 @@ setTransferSuccess(
  }
 
 };
-const [
- showSuccess,
- setShowSuccess
-]
-=
-useState(false);
+// const [
+//  showSuccess,
+//  setShowSuccess
+// ]
+// =
+// useState(false);
 
-const [
- transactionData,
- setTransactionData
-]
-=
-useState<any>(null);
+// const [
+//  transactionData,
+//  setTransactionData
+// ]
+// =
+// useState<any>(null);
 useEffect(()=>{
   if(
   location.state
