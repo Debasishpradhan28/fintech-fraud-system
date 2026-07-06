@@ -443,7 +443,16 @@ const FraudNetworkGraph = forwardRef<GraphMethods,Props>(({
 
                 onNodeClick={(node:any)=>{
 
-                    setSelectedNode(node);
+                    setSelectedNode({
+                       id: node.id,
+                       label: node.label,
+                       type: node.type,
+                       riskScore: node.riskScore,
+                       connections: node.connections,
+                       totalSent: node.totalSent,
+                      totalReceived: node.totalReceived,
+                       trustScore: node.trustScore
+                    });
 
                 }}
 

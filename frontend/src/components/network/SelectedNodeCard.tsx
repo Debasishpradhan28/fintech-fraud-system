@@ -8,9 +8,10 @@ import {
 
 interface Props{
     node:any;
+    edges?: any[];
 }
 
-function SelectedNodeCard({ node }:Props){
+function SelectedNodeCard({ node, edges }:Props){
 
     if(!node){
 
@@ -36,11 +37,31 @@ function SelectedNodeCard({ node }:Props){
 
     }
 
+    // Support both camelCase and snake_case fields and compute
+    // connections / totals from edges if they're not present on the node.
+    const risk = node.riskScore ?? node.risk_score ?? 0;
+
+    const nodeId = node.id ?? node.label ?? node.account_number;
+
+    const edgeList = Array.isArray(edges) ? edges : [];
+
+    const computedConnections = edgeList.filter(
+        (e:any) => e.source === nodeId || e.target === nodeId
+    ).length;
+
+    const computedTotalSent = edgeList
+        .filter((e:any) => e.source === nodeId)
+        .reduce((s:any, e:any) => s + Number(e.amount || 0), 0);
+
+    const computedTotalReceived = edgeList
+        .filter((e:any) => e.target === nodeId)
+        .reduce((s:any, e:any) => s + Number(e.amount || 0), 0);
+
     const riskColor =
-    node.riskScore >= 120
+    risk >= 120
     ? "text-red-600"
 
-    : node.riskScore >= 70
+    : risk >= 70
     ? "text-orange-500"
 
     : "text-green-600";
@@ -96,7 +117,7 @@ function SelectedNodeCard({ node }:Props){
 
                         <h3 className={`font-bold ${riskColor}`}>
 
-                            {node.riskScore ?? 0}
+                               {risk}
 
                         </h3>
 
@@ -114,7 +135,7 @@ function SelectedNodeCard({ node }:Props){
 
                         <h3 className="font-bold">
 
-                            {node.connections ?? 0}
+                            {node.connections ?? node.num_connections ?? computedConnections}
 
                         </h3>
 
@@ -136,7 +157,7 @@ function SelectedNodeCard({ node }:Props){
 
                         <h3 className="font-bold">
 
-                            ₹{Number(node.totalSent ?? 0).toLocaleString()}
+                            ₹{Number(node.totalSent ?? node.total_sent ?? computedTotalSent).toLocaleString()}
 
                         </h3>
 
@@ -154,7 +175,7 @@ function SelectedNodeCard({ node }:Props){
 
                         <h3 className="font-bold">
 
-                            ₹{Number(node.totalReceived ?? 0).toLocaleString()}
+                            ₹{Number(node.totalReceived ?? node.total_received ?? computedTotalReceived).toLocaleString()}
 
                         </h3>
 

@@ -1,31 +1,41 @@
-import Sidebar from "./Sidebar";
+import BottomNav from "./BottomNav";
 
 function Layout({ children }: any) {
 
-  return (
+    return (
 
-    <div className="flex">
+        <div
+            className="
+            min-h-screen
 
-      <Sidebar />
+            bg-slate-100
 
-      <main
-      className="
-      flex-1
-      min-w-0
-      overflow-x-hidden
-      overflow-y-auto
-     bg-slate-100
-      p-4
-     sm:p-6
-     lg:p-8
-     "
-    >
-        {children}
-      </main>
+            pb-28
+            "
+        >
 
-    </div>
+            <main
+                className="
+                max-w-[1700px]
 
-  );
+                mx-auto
+
+                px-5
+                lg:px-8
+
+                pt-6
+                "
+            >
+
+                {children}
+
+            </main>
+
+            <BottomNav />
+
+        </div>
+
+    );
 
 }
 

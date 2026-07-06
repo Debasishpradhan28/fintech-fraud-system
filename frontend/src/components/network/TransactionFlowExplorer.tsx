@@ -13,7 +13,16 @@ function TransactionFlowExplorer({
     edges
 
 }:Props){
+const getAccountLabel = (account: any) => {
 
+    if (!account) return "-";
+
+    if (typeof account === "object") {
+        return account.label || account.id;
+    }
+
+    return account;
+};
     return(
 
 <div className="
@@ -113,7 +122,7 @@ font-semibold
 break-all
 ">
 
-{edge.source}
+{getAccountLabel(edge.source)}
 
 </h3>
 
@@ -158,7 +167,7 @@ font-semibold
 break-all
 ">
 
-{edge.target}
+{getAccountLabel(edge.target)}
 
 </h3>
 

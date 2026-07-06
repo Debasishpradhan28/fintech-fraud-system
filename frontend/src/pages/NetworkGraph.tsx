@@ -89,8 +89,8 @@ console.log(response.data);
    <NetworkSummary  metrics={metrics}   account={account}/>
    <div className="lg:col-span-8">
     <GraphToolbar/>
-    <div className="grid grid-cols-12 gap-6" >
-        <div className="col-span-8 bg-white rounded-3xl shadow-lg border p-4 h-162.5 overflow-hidden hover:shadow-xl transition-all duration-300">
+    <div className="grid xl:grid-cols-12 grid-cols-1 gap-6" >
+        <div className="xl:col-span-8 col-span-1 bg-white rounded-3xl shadow-lg border p-4 h-162.5 overflow-hidden hover:shadow-xl transition-all duration-300">
             <FraudNetworkGraph
                 ref={graphRef}
                 nodes={nodes}
@@ -99,9 +99,9 @@ console.log(response.data);
                 setSelectedNode={setSelectedNode}
             />
         </div>
-        <div className="col-span-4 sm:h-105 space-y-6 overflow-y-auto pr-2">
+        <div className="xl:col-span-4 col-span-1 sm:h-105 space-y-6 overflow-y-auto pr-2">
         <AccountCard account={account} />
-        <SelectedNodeCard  node={selectedNode} />
+        <SelectedNodeCard  node={selectedNode} edges={edges} />
         <AiInvestigationCard node={selectedNode} />
         <QuickActionsCard selectedNode={selectedNode} />
         <RecentActivityCard timeline={timeline}/>
