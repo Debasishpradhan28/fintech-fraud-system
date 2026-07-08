@@ -362,8 +362,8 @@ function RoleManagementCard() {
             
             {/* Grant Access Modal */}
             {showGrantDialog && searchedUser && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
-                    <div className="bg-white rounded-3xl shadow-xl w-full max-w-[430px] p-8">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-999 p-4">
+                    <div className="bg-white rounded-3xl shadow-xl w-full max-w-107.5 p-8">
                         <h2 className="text-2xl font-bold text-slate-800">Grant Analyst Access</h2>
                         <p className="mt-3 text-slate-500 leading-relaxed">
                             This user will gain access to analytics, investigations, fraud monitoring, and dashboards.
@@ -393,8 +393,8 @@ function RoleManagementCard() {
 
             {/* Remove Access Modal */}
             {showRemoveDialog && selectedAnalyst && (
-                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[999] p-4">
-                    <div className="bg-white rounded-3xl shadow-xl w-full max-w-[430px] p-8">
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-999 p-4">
+                    <div className="bg-white rounded-3xl shadow-xl w-full max-w-107.5 p-8">
                         <h2 className="text-2xl font-bold text-slate-800">Remove Analyst Access</h2>
                         <p className="mt-3 text-slate-500 leading-relaxed">
                             Are you sure you want to revoke analyst privileges for this user? They will lose access to all admin dashboards immediately.

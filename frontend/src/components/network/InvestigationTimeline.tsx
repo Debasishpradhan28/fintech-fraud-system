@@ -120,7 +120,7 @@ index!==timeline.length-1
 &&
 
 <div className="
-w-[2px]
+w-0.5
 flex-1
 bg-slate-300
 mt-2

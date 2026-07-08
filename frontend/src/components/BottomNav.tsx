@@ -132,7 +132,7 @@ duration-300
                                     absolute
                                     inset-0
 
-                                    bg-gradient-to-r
+                                    bg-linear-to-r
                                     from-blue-500
                                     to-blue-600
                                     

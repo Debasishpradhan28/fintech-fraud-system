@@ -82,7 +82,7 @@ function NetworkSummary({
 
                     <div
                         className={`
-                        bg-gradient-to-r
+                        bg-linear-to-r
                         ${card.color}
                         text-white
                         p-4

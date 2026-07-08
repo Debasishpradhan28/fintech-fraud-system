@@ -1,13 +1,11 @@
-import {useEffect,useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Layout from "../components/Layout";
-// import PageHeader from "../components/PageHeader";
 import FraudNetworkGraph from "../components/FraudNetworkGraph";
 import api from "../services/api";
 import { useParams } from "react-router-dom";
 import NetworkHeader from "../components/network/NetworkHeader";
 import NetworkSummary from "../components/network/NetworkSummary";
 import GraphToolbar from "../components/network/GraphToolbar";
-import {useRef} from "react";
 import AccountCard from "../components/network/AccountCard";
 import SelectedNodeCard from "../components/network/SelectedNodeCard";
 import AiInvestigationCard from "../components/network/AiInvestigationCard";
@@ -17,118 +15,103 @@ import InvestigationTimeline from "../components/network/InvestigationTimeline";
 import PatternDetectionCard from "../components/network/PatternDetectionCard";
 import TransactionFlowExplorer from "../components/network/TransactionFlowExplorer";
 
-function NetworkGraph(){
+function NetworkGraph() {
+  const [nodes, setNodes] = useState<any[]>([]);
+  const [edges, setEdges] = useState<any[]>([]);
+  const [account, setAccount] = useState<any>(null);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [timeline, setTimeline] = useState<any[]>([]);
+  const [selectedNode, setSelectedNode] = useState<any>(null);
+  
+  const { id } = useParams();
+  const graphRef = useRef<any>(null);
+  
+  const fetchNetwork = async () => {
+    console.log("Started Fetch");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await api.get(`/fraud/network/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
- const [nodes, setNodes] = useState<any[]>([]);
- const [edges, setEdges] = useState<any[]>([]);
-
-const [account, setAccount] = useState<any>(null);
-const [metrics, setMetrics] = useState<any>(null);
-const [timeline, setTimeline] = useState<any[]>([]);
-// const [patterns, setPatterns] = useState<any[]>([]);
-// const [recommendations, setRecommendations] = useState<any[]>([]);
-// const [aiSummary, setAiSummary] = useState("");
-const [selectedNode, setSelectedNode] = useState<any>(null);
-// const [search, setSearch] = useState("");
-// const [filter, setFilter] = useState("ALL");
-// const [filterOpen, setFilterOpen] = useState(false);
-const { id } = useParams();
-const graphRef = useRef<any>(null);
- const fetchNetwork = async () => {
-console.log("Started Fetch");
- try{
-
-  const token =
-  localStorage.getItem("token");
-
-  const response =
-  await api.get(
-
-   `/fraud/network/${id}`,
-
-   {
-    headers:{
-     Authorization:`Bearer ${token}`
+      const data = response.data;
+      setNodes(data.nodes);
+      setEdges(data.edges);
+      setAccount(data.account);
+      setMetrics(data.metrics);
+      setTimeline(data.timeline);
+      
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
     }
-   }
+  };
 
-  );
+  useEffect(() => {
+    if (id) {
+      fetchNetwork();
+    }
+  }, [id]);
 
-  const data = response.data;
-  setNodes(data.nodes);
-  setEdges(data.edges);
-  setAccount(data.account);
-  setMetrics(data.metrics);
-  setTimeline(data.timeline);
-//   setPatterns(data.patterns);
-//   setRecommendations(
-//    data.recommendations
-//   );
-//   setAiSummary(
-//    data.aiSummary
-//   );
-console.log(response.data);
- }catch(error){
-  console.log(error);
- }
+  return (
+    <Layout>
+      <div className="max-w-400 mx-auto space-y-6 pb-12 relative z-0">
+        
+        {/* Header & High-Level Metrics */}
+        <NetworkHeader />
+        <NetworkSummary metrics={metrics} account={account} />
 
-};
-
- useEffect(()=>{
- if(id){
-  fetchNetwork();
- }
- },[id]);
-
- return(
-
-  <Layout>
-
-   <NetworkHeader />
-
-   <NetworkSummary  metrics={metrics}   account={account}/>
-   <div className="lg:col-span-8">
-    <GraphToolbar/>
-    <div className="grid xl:grid-cols-12 grid-cols-1 gap-6" >
-        <div className="xl:col-span-8 col-span-1 bg-white rounded-3xl shadow-lg border p-4 h-162.5 overflow-hidden hover:shadow-xl transition-all duration-300">
-            <FraudNetworkGraph
+        {/* Main Workspace (Graph & Context Sidebar) */}
+        <div className="space-y-4">
+          <GraphToolbar />
+          
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            
+            {/* Left Column: Network Graph Interactive Area */}
+            <div className="xl:col-span-8 col-span-1 bg-white rounded-3xl shadow-sm border border-slate-200 p-4 h-150 xl:h-187.5 relative overflow-hidden group hover:shadow-md transition-shadow duration-300">
+              <FraudNetworkGraph
                 ref={graphRef}
                 nodes={nodes}
                 edges={edges}
                 selectedNode={selectedNode}
                 setSelectedNode={setSelectedNode}
-            />
+              />
+            </div>
+            
+            {/* Right Column: Contextual Sidebar */}
+            <div className="xl:col-span-4 col-span-1 flex flex-col space-y-5 h-auto xl:h-187.5 overflow-y-auto pr-2 pb-2">
+              <AccountCard account={account} />
+              <SelectedNodeCard node={selectedNode} edges={edges} />
+              <AiInvestigationCard node={selectedNode} />
+              <QuickActionsCard selectedNode={selectedNode} />
+              <RecentActivityCard timeline={timeline} />
+            </div>
+            
+          </div>
         </div>
-        <div className="xl:col-span-4 col-span-1 sm:h-105 space-y-6 overflow-y-auto pr-2">
-        <AccountCard account={account} />
-        <SelectedNodeCard  node={selectedNode} edges={edges} />
-        <AiInvestigationCard node={selectedNode} />
-        <QuickActionsCard selectedNode={selectedNode} />
-        <RecentActivityCard timeline={timeline}/>
-       </div>
-    </div>
-</div>
-<div className="mt-8">
 
-<InvestigationTimeline
+        {/* Deep Dive Investigation Section */}
+        <div className="pt-8 mt-8 border-t border-slate-200 space-y-8">
+          <div className="mb-2">
+            <h2 className="text-2xl font-bold text-slate-800">Deep Dive Analysis</h2>
+            <p className="text-slate-500 mt-1">Explore historical events, detected anomalies, and transaction paths.</p>
+          </div>
 
-timeline={timeline}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <InvestigationTimeline timeline={timeline} />
+            <PatternDetectionCard account={account} timeline={timeline} />
+          </div>
 
-/>
-<PatternDetectionCard
-
-account={account}
-
-timeline={timeline}
-
-/>
-<TransactionFlowExplorer edges={edges} />
-
-</div>
-  </Layout>
-
- );
-
+          <div className="w-full">
+            <TransactionFlowExplorer edges={edges} />
+          </div>
+        </div>
+        
+      </div>
+    </Layout>
+  );
 }
 
 export default NetworkGraph;

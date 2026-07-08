@@ -14,7 +14,7 @@ function Settings(){
     const [showBanner,setShowBanner] = useState(true);
     const [showAnalytics,setShowAnalytics] = useState(true);
     const [aiSummaryEnabled,setAiSummaryEnabled] = useState(true);
-    const [patternDetection,setPatternDetection] = useState(true);
+    const [patternDetection] = useState(true);
     const [fullName,setFullName] = useState("");
     const [email,setEmail] = useState("");
     const [showPasswordModal, setShowPasswordModal]= useState(false);
@@ -504,7 +504,7 @@ risk exceeds this threshold.
 
  p-8
 
- w-[500px]
+ w-125
 
  max-w-[95%]
  "
