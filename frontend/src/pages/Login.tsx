@@ -277,7 +277,7 @@ function Login() {
       {/* ========================================== */}
       <div className="hidden lg:flex w-[45%] bg-[#0b1120] text-white p-12 xl:p-16 flex-col relative overflow-hidden">
         {/* Subtle background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-br from-blue-900/10 to-transparent pointer-events-none" />
         
         {/* Top Logo */}
         <div className="relative z-10 flex items-center gap-3 mb-12 shrink-0">
@@ -288,7 +288,7 @@ function Login() {
         </div>
 
         {/* Dynamic Slide Content - FIXED OVERLAP BUG */}
-        <div className="relative z-10 flex-1 flex flex-col justify-center min-h-[500px]">
+        <div className="relative z-10 flex-1 flex flex-col justify-center min-h-125">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -368,7 +368,7 @@ function Login() {
       {/* Right Side: Auth Flow                    */}
       {/* ========================================== */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative">
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-105">
           
           <motion.div
             initial={{ opacity: 0, y: 20 }}
