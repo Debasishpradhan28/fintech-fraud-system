@@ -78,52 +78,37 @@ const getProfile = async (req,res)=>{
  }
 
 };
-const getBanking = async (req,res)=>{
+const getBanking = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
- try{
+    // FIX: Using LEFT JOIN and COALESCE ensures we always return valid data,
+    // even if the user's account row is completely missing from the database.
+    const result = await pool.query(
+      `
+      SELECT 
+        u.full_name, 
+        COALESCE(a.account_number, 'PROVISIONING...') as account_number, 
+        COALESCE(a.balance, 0.00) as balance, 
+        COALESCE(ts.score, 500) AS trust_score 
+      FROM users u 
+      LEFT JOIN accounts a ON u.id = a.user_id 
+      LEFT JOIN trust_scores ts ON u.id = ts.user_id 
+      WHERE u.id = $1
+      `,
+      [userId]
+    );
 
-  const userId =
-  req.user.id;
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User profile not found" });
+    }
 
-  const result =
-  await pool.query(
-  `
-  SELECT
+    res.status(200).json(result.rows[0]);
 
-   u.full_name,
-
-   a.account_number,
-
-   a.balance,
-
-   ts.score
-   AS trust_score
-
-  FROM users u
-
-  JOIN accounts a
-  ON u.id = a.user_id
-
-  LEFT JOIN trust_scores ts
-  ON u.id = ts.user_id
-
-  WHERE u.id = $1
-  `,
-  [userId]
-  );
-
-  res.status(200).json(
-   result.rows[0]
-  );
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+  } catch (error) {
+    console.error("GET BANKING ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 };
 const searchUsers = async(req,res)=>{
 

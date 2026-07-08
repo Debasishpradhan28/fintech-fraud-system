@@ -16,7 +16,7 @@ function Layout({ children }: any) {
 
             <main
                 className="
-                max-w-[1700px]
+                max-w-425
 
                 mx-auto
 

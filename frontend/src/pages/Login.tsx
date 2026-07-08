@@ -99,6 +99,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   
   // Slider State
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -135,6 +136,7 @@ function Login() {
     setConfirmPassword("");
     setErrorMsg(message);
     setLoading(false);
+    setRegistrationSuccess(false);
   }, []);
 
   useEffect(() => {
@@ -241,12 +243,12 @@ function Login() {
         password
       });
 
-      setAuthMode("LOGIN");
-      setStep(1);
+      // Show the Success Card properly
+      setRegistrationSuccess(true);
       setPassword("");
       setConfirmPassword("");
       setErrorMsg("");
-      alert("Registration successful. Please log in."); 
+      
     } catch (error: any) {
       console.error(error);
       setErrorMsg(error?.response?.data?.message || "Registration failed. Please try again.");
@@ -261,6 +263,7 @@ function Login() {
     setErrorMsg("");
     setPassword("");
     setConfirmPassword("");
+    setRegistrationSuccess(false);
   };
 
   const formSlideVariants = {
@@ -273,13 +276,11 @@ function Login() {
     <div className="min-h-screen flex bg-slate-50 font-sans selection:bg-blue-200">
       
       {/* ========================================== */}
-      {/* Left Side: Dynamic Enterprise Slider     */}
+      {/* Left Side: Dynamic Enterprise Slider       */}
       {/* ========================================== */}
       <div className="hidden lg:flex w-[45%] bg-[#0b1120] text-white p-12 xl:p-16 flex-col relative overflow-hidden">
-        {/* Subtle background gradient overlay */}
         <div className="absolute inset-0 bg-linear-to-br from-blue-900/10 to-transparent pointer-events-none" />
         
-        {/* Top Logo */}
         <div className="relative z-10 flex items-center gap-3 mb-12 shrink-0">
           <svg className="w-9 h-9 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -287,7 +288,6 @@ function Login() {
           <h1 className="text-2xl font-bold tracking-tight">TrustGuard</h1>
         </div>
 
-        {/* Dynamic Slide Content - FIXED OVERLAP BUG */}
         <div className="relative z-10 flex-1 flex flex-col justify-center min-h-125">
           <AnimatePresence mode="wait">
             <motion.div
@@ -298,9 +298,7 @@ function Login() {
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="w-full"
             >
-              {/* Technical Sketch Graphic */}
               {SLIDES[currentSlide].sketch}
-
               <h2 className="text-4xl xl:text-5xl font-bold leading-tight mb-6 tracking-tight">
                 {SLIDES[currentSlide].title.split('. ').map((part, i, arr) => (
                   <span key={i}>
@@ -309,11 +307,9 @@ function Login() {
                   </span>
                 ))}
               </h2>
-              
               <p className="text-lg text-slate-400 mb-10 max-w-md leading-relaxed">
                 {SLIDES[currentSlide].desc}
               </p>
-
               <div className="space-y-4 text-slate-300">
                 {SLIDES[currentSlide].features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-3">
@@ -330,9 +326,7 @@ function Login() {
           </AnimatePresence>
         </div>
 
-        {/* Bottom Controls: Pagination & Arrows - No longer floating over text */}
         <div className="relative z-10 flex items-center justify-between pt-8 mt-auto border-t border-slate-800/50 shrink-0">
-          {/* Pagination Dots */}
           <div className="flex gap-2">
             {SLIDES.map((_, index) => (
               <button
@@ -345,8 +339,6 @@ function Login() {
               />
             ))}
           </div>
-
-          {/* Navigation Arrows */}
           <div className="flex gap-3">
             <button 
               onClick={prevSlide}
@@ -376,183 +368,212 @@ function Login() {
             transition={{ duration: 0.4 }}
             className="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 p-8 sm:p-10 border border-slate-100"
           >
-            {/* Header & Back Button */}
-            <div className="mb-8 relative">
-              {step === 2 && (
-                <button 
-                  onClick={() => setStep(1)}
-                  className="absolute -left-2 -top-2 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                </button>
-              )}
-              <h2 className="text-2xl font-bold text-slate-900 text-center">
-                {authMode === "LOGIN" 
-                  ? (step === 1 ? "Sign In to TrustGuard" : "Enter Password") 
-                  : (step === 1 ? "Create Account" : "Secure Your Account")}
-              </h2>
-            </div>
-
-            {/* Error Banner */}
-            {errorMsg && (
+            {/* SUCCESS CARD UI - Rendered completely in document flow */}
+            {registrationSuccess ? (
               <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-3"
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center text-center py-4"
               >
-                <svg className="w-5 h-5 shrink-0 mt-0.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {errorMsg}
+                <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center border-4 border-green-100 mb-6">
+                  <svg className="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-3">Account Provisioned</h2>
+                <p className="text-slate-500 mb-8 leading-relaxed">
+                  Your TrustGuard secure identity has been successfully created. You can now access the portal.
+                </p>
+                <button
+                  onClick={() => switchMode("LOGIN")}
+                  className="w-full bg-blue-600 text-white p-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Proceed to Sign In
+                </button>
               </motion.div>
-            )}
-
-            {/* Form Steps */}
-            <form onSubmit={step === 1 ? handleNextStep : (authMode === "LOGIN" ? handleLogin : handleRegister)}>
-              <AnimatePresence mode="wait">
-                
-                {/* STEP 1: IDENTIFIER */}
-                {step === 1 && (
-                  <motion.div
-                    key="step1"
-                    variants={formSlideVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ duration: 0.2 }}
-                    className="space-y-5"
-                  >
-                    {authMode === "REGISTER" && (
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Legal Full Name</label>
-                        <input
-                          autoFocus
-                          type="text"
-                          required
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                          className="w-full border border-slate-200 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
-                          placeholder="John Doe"
-                        />
-                      </div>
-                    )}
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                      <input
-                        autoFocus={authMode === "LOGIN"}
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full border border-slate-200 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
-                        placeholder="john.doe@example.com"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      className="w-full bg-[#0b1120] text-white p-4 rounded-xl font-semibold hover:bg-slate-800 transition-colors mt-2"
+            ) : (
+              /* NORMAL FORM UI */
+              <>
+                {/* Header & Back Button */}
+                <div className="mb-8 relative">
+                  {step === 2 && (
+                    <button 
+                      onClick={() => setStep(1)}
+                      className="absolute -left-2 -top-2 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50 rounded-full transition-colors"
                     >
-                      Continue
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
                     </button>
+                  )}
+                  <h2 className="text-2xl font-bold text-slate-900 text-center">
+                    {authMode === "LOGIN" 
+                      ? (step === 1 ? "Sign In to TrustGuard" : "Enter Password") 
+                      : (step === 1 ? "Create Account" : "Secure Your Account")}
+                  </h2>
+                </div>
+
+                {/* Error Banner */}
+                {errorMsg && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mb-6 bg-red-50 text-red-700 p-4 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-3"
+                  >
+                    <svg className="w-5 h-5 shrink-0 mt-0.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {errorMsg}
                   </motion.div>
                 )}
 
-                {/* STEP 2: CREDENTIALS */}
-                {step === 2 && (
-                  <motion.div
-                    key="step2"
-                    variants={formSlideVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    transition={{ duration: 0.2 }}
-                    className="space-y-5"
-                  >
-                    {authMode === "LOGIN" && (
-                      <div className="text-sm font-medium text-slate-500 text-center mb-6 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        {email}
-                      </div>
+                {/* Form Steps */}
+                <form onSubmit={step === 1 ? handleNextStep : (authMode === "LOGIN" ? handleLogin : handleRegister)}>
+                  <AnimatePresence mode="wait">
+                    
+                    {/* STEP 1: IDENTIFIER */}
+                    {step === 1 && (
+                      <motion.div
+                        key="step1"
+                        variants={formSlideVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={{ duration: 0.2 }}
+                        className="space-y-5"
+                      >
+                        {authMode === "REGISTER" && (
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Legal Full Name</label>
+                            <input
+                              autoFocus
+                              type="text"
+                              required
+                              value={fullName}
+                              onChange={(e) => setFullName(e.target.value)}
+                              className="w-full border border-slate-200 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
+                              placeholder="John Doe"
+                            />
+                          </div>
+                        )}
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                          <input
+                            autoFocus={authMode === "LOGIN"}
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full border border-slate-200 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
+                            placeholder="john.doe@example.com"
+                          />
+                        </div>
+
+                        <button
+                          type="submit"
+                          className="w-full bg-[#0b1120] text-white p-4 rounded-xl font-semibold hover:bg-slate-800 transition-colors mt-2"
+                        >
+                          Continue
+                        </button>
+                      </motion.div>
                     )}
 
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
-                      <div className="relative">
-                        <input
-                          autoFocus
-                          type={showPassword ? "text" : "password"}
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full border border-slate-200 rounded-xl p-3.5 pr-12 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
-                          placeholder="••••••••"
-                        />
+                    {/* STEP 2: CREDENTIALS */}
+                    {step === 2 && (
+                      <motion.div
+                        key="step2"
+                        variants={formSlideVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={{ duration: 0.2 }}
+                        className="space-y-5"
+                      >
+                        {authMode === "LOGIN" && (
+                          <div className="text-sm font-medium text-slate-500 text-center mb-6 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            {email}
+                          </div>
+                        )}
+
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                          <div className="relative">
+                            <input
+                              autoFocus
+                              type={showPassword ? "text" : "password"}
+                              required
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              className="w-full border border-slate-200 rounded-xl p-3.5 pr-12 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
+                              placeholder="••••••••"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            >
+                              {showPassword ? (
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0a10.05 10.05 0 015.71-1.593c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" /></svg>
+                              ) : (
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {authMode === "REGISTER" && (
+                          <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Confirm Password</label>
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              required
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              className="w-full border border-slate-200 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
+                              placeholder="••••••••"
+                            />
+                          </div>
+                        )}
+
                         <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                          type="submit"
+                          disabled={loading}
+                          className="w-full bg-blue-600 text-white p-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                         >
-                          {showPassword ? (
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0a10.05 10.05 0 015.71-1.593c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0l-3.29-3.29" /></svg>
+                          {loading ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Authenticating...
+                            </>
                           ) : (
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            authMode === "LOGIN" ? "Secure Login" : "Create Account"
                           )}
                         </button>
-                      </div>
-                    </div>
-
-                    {authMode === "REGISTER" && (
-                      <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">Confirm Password</label>
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          required
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full border border-slate-200 rounded-xl p-3.5 focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 outline-none transition-all bg-slate-50 focus:bg-white"
-                          placeholder="••••••••"
-                        />
-                      </div>
+                      </motion.div>
                     )}
+                  </AnimatePresence>
+                </form>
 
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full bg-blue-600 text-white p-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-2 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                    >
-                      {loading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Authenticating...
-                        </>
-                      ) : (
-                        authMode === "LOGIN" ? "Secure Login" : "Create Account"
-                      )}
-                    </button>
-                  </motion.div>
+                {/* Bottom Toggle */}
+                {step === 1 && (
+                  <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+                    <p className="text-sm text-slate-500">
+                      {authMode === "LOGIN" ? "Don't have an account?" : "Already have an account?"}
+                      <button
+                        onClick={() => switchMode(authMode === "LOGIN" ? "REGISTER" : "LOGIN")}
+                        className="ml-2 font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      >
+                        {authMode === "LOGIN" ? "Open Account" : "Sign In"}
+                      </button>
+                    </p>
+                  </div>
                 )}
-              </AnimatePresence>
-            </form>
-
-            {/* Bottom Toggle */}
-            {step === 1 && (
-              <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                <p className="text-sm text-slate-500">
-                  {authMode === "LOGIN" ? "Don't have an account?" : "Already have an account?"}
-                  <button
-                    onClick={() => switchMode(authMode === "LOGIN" ? "REGISTER" : "LOGIN")}
-                    className="ml-2 font-semibold text-blue-600 hover:text-blue-700 transition-colors"
-                  >
-                    {authMode === "LOGIN" ? "Open Account" : "Sign In"}
-                  </button>
-                </p>
-              </div>
+              </>
             )}
           </motion.div>
 

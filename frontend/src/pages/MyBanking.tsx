@@ -135,7 +135,7 @@ if(!banking){
   {/* Banking Card */}
 
   <div className="
-bg-gradient-to-r
+bg-linear-to-r
 from-blue-600
 to-indigo-700
 text-white
@@ -295,7 +295,7 @@ overflow-x-auto
  }
 
  className="
- min-w-[140px]
+ min-w-35
  bg-slate-50
  rounded-xl
  p-4
@@ -367,7 +367,7 @@ overflow-x-auto
 
   p-8
 
-  w-[420px]
+  w-105
 
   shadow-2xl
   "
@@ -500,7 +500,7 @@ overflow-x-auto
     className="
     flex-1
 
-    bg-gradient-to-r
+    bg-linear-to-r
     from-blue-600
     to-indigo-700
 

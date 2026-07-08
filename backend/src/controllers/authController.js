@@ -44,8 +44,7 @@ const registerUser = async (req, res) => {
                 [
                     full_name,
                     email,
-                    hashedPassword,
-                    role
+                    hashedPassword
                 ]
             );
             await pool.query(
@@ -66,7 +65,12 @@ VALUES
     500
 ]
 );
-            
+            const generateAccountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+            await pool.query(
+            `INSERT INTO accounts (user_id, account_number, balance, currency) 
+             VALUES ($1, $2, $3, $4)`,
+             [newUser.rows[0].id, generateAccountNumber, 0.00, 'USD']
+            );
 
         res.status(201).json({
             success:true,

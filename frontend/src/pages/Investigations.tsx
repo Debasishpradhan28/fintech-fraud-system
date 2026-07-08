@@ -202,7 +202,7 @@ mb-6
 ">
 
 <div className="
-bg-gradient-to-r
+bg-linear-to-r
 from-red-500
 to-red-600
 text-white
@@ -226,7 +226,7 @@ Critical Cases
 </div>
 
 <div className="
-bg-gradient-to-r
+bg-linear-to-r
 from-yellow-500
 to-orange-500
 text-white
@@ -250,7 +250,7 @@ Pending Review
 </div>
 
 <div className="
-bg-gradient-to-r
+bg-linear-to-r
 from-green-500
 to-green-600
 text-white
