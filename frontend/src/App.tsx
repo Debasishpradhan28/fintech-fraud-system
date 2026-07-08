@@ -19,6 +19,8 @@ import TransferMoney from "./pages/TransferMoney";
 import History from "./pages/History";
 import Investigations from "./pages/Investigations";
 import Settings from "./pages/Settings";
+import ProtectedRoute from "./components/ProtectedRoute";
+import AccessDenied from "./pages/AccessDenied";
 
 function App() {
 
@@ -35,64 +37,119 @@ function App() {
 
     <Route
      path="/dashboard"
-     element={<Dashboard />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <Dashboard />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/analytics"
-     element={<Analytics />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <Analytics />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/fraud-alerts"
-     element={<FraudAlerts />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <FraudAlerts />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/risky-users"
-     element={<RiskyUsers />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <RiskyUsers />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/transactions"
-     element={<Transactions />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <Transactions />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/profile"
-     element={<Profile />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST", "CUSTOMER"]}>
+     <Profile />
+        </ProtectedRoute>
+     }
     />
     <Route
      path="/fraud-investigation/:id"
-     element={<FraudInvestigation />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <FraudInvestigation />
+        </ProtectedRoute>
+     }
     />
     <Route
      path="/network/:id"
-     element={<NetworkGraph />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <NetworkGraph />
+        </ProtectedRoute>
+     }
     />
     <Route
      path="/my-banking"
-     element={<MyBanking />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST", "CUSTOMER"]}>
+     <MyBanking />
+        </ProtectedRoute>
+     }
     />
     <Route
      path="/transfer"
-     element={<TransferMoney />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST", "CUSTOMER"]}>
+     <TransferMoney />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/history"
-     element={<History />}
+     element={
+        <ProtectedRoute roles={["ADMIN","CUSTOMER"]}>
+     <History />
+        </ProtectedRoute>
+     }
     />
 
     <Route
      path="/investigations"
-     element={<Investigations/>}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST"]}>
+     <Investigations />
+        </ProtectedRoute>
+     }
     />
     <Route
      path="/settings"
-     element={<Settings />}
+     element={
+        <ProtectedRoute roles={["ADMIN", "ANALYST", "CUSTOMER"]}>
+     <Settings />
+        </ProtectedRoute>
+     }
     />
-    
+    <Route
+     path="/access-denied"
+     element={<AccessDenied />}
+    />
    </Routes>
 
   </BrowserRouter>

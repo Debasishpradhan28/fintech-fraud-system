@@ -1,23 +1,14 @@
-const express =
-require("express");
+const express =require("express");
+const router =express.Router();
+const verifyToken =require("../middleware/authMiddleware");
+const requireAnalyst = require("../middleware/analystMiddleware");
 
-const router =
-express.Router();
-
-const verifyToken =
-require("../middleware/authMiddleware");
-
-const {
- getDashboardData
-}
-=
-require(
- "../controllers/dashboardController"
-);
+const { getDashboardData}=require( "../controllers/dashboardController");
 
 router.get(
  "/",
  verifyToken,
+ requireAnalyst,
  getDashboardData
 );
 

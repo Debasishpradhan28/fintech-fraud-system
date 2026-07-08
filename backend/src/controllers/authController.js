@@ -38,13 +38,14 @@ const registerUser = async (req, res) => {
         const newUser =
             await pool.query(
                 `INSERT INTO users
-                (full_name,email,password_hash)
-                VALUES($1,$2,$3)
+                (full_name,email,password_hash,role)
+                VALUES($1,$2,$3,'CUSTOMER')
                 RETURNING *`,
                 [
                     full_name,
                     email,
-                    hashedPassword
+                    hashedPassword,
+                    role
                 ]
             );
             await pool.query(
@@ -185,7 +186,8 @@ if(existingDevice.rows.length === 0){
         const token = jwt.sign(
             {
                 id:user.id,
-                email:user.email
+                email:user.email,
+                role:user.role
             },
             process.env.JWT_SECRET,
             {
@@ -196,9 +198,14 @@ if(existingDevice.rows.length === 0){
 
         res.status(200).json({
             success:true,
-            token
+            token,
+            user:{
+                id:user.id,
+                name:user.full_name,
+                email:user.email,
+                role:user.role
+            }
         });
-
     } catch(error){
 
         console.error(error);

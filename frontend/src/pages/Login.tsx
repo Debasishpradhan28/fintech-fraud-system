@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import {useNavigate} from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const { setUser } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +22,7 @@ function Login() {
     const response = await api.post(
       "/auth/login",
       {
-        email,
+        email: email.trim(),
         password,
         deviceFingerprint: "Windows-Chrome",
         location: "Odisha"
@@ -29,9 +33,21 @@ function Login() {
       "token",
       response.data.token
     );
-
-    window.location.href ="/dashboard";
-
+    localStorage.setItem(
+      "role",
+      response.data.user.role
+    );
+    localStorage.setItem(
+      "user",
+      JSON.stringify(response.data.user)
+    );
+    setUser(response.data.user);
+    const role = response.data.user.role;
+    if (role === "CUSTOMER") {
+      navigate("/profile", { replace: true });
+    } else {
+      navigate("/dashboard", { replace: true });
+    }
   } catch (error : any) {
 
     alert(error?.response?.data?.message||"Login Failed");
@@ -41,20 +57,28 @@ function Login() {
   } finally {
 
     setLoading(false);
-
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setIsLogin(true);
   }
 };
 const handleRegister = async () => {
 
   try {
+    if (password !== confirmPassword) {
+    alert("Passwords do not match");
+    return;
+    }
 
     setLoading(true);
 
     await api.post(
       "/auth/register",
       {
-        full_name: fullName,
-        email,
+        full_name: fullName.trim(),
+        email: email.trim(),
         password
       }
     );

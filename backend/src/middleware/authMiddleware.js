@@ -20,7 +20,7 @@ const verifyToken = (req, res, next) => {
         );
 
         req.user = decoded;
-
+        console.log("Decoded JWT:", decoded);
         next();
 
     } catch (error) {

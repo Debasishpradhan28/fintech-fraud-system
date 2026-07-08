@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
 import PageHeader from "../components/PageHeader";
 import api from "../services/api";
+import RoleManagementCard from "../components/settings/RoleManagementCard";
+import { useAuth } from "../context/AuthContext";
 
 function Settings(){
     const [emailAlerts,setEmailAlerts] = useState(true);
@@ -19,6 +21,7 @@ function Settings(){
     const [currentPassword,setCurrentPassword]= useState("");
     const [newPassword, setNewPassword]= useState("");
     const [confirmPassword, setConfirmPassword]= useState("");
+    const { user } = useAuth();
 
 const saveSettings = ()=>{
 
@@ -160,8 +163,7 @@ useEffect(()=>{
 
  if(!saved) return;
 
- const settings =
- JSON.parse(saved);
+ const settings = JSON.parse(saved);
 
  setFullName(
   settings.fullName || ""
@@ -441,157 +443,6 @@ risk exceeds this threshold.
 
     </div>
 
-    {/* Dashboard */}
-    <div className="bg-white rounded-2xl shadow p-6">
-
-     <h2 className="text-xl font-bold mb-4">
-      📊 Dashboard Preferences
-     </h2>
-
-     <div className="space-y-4">
-
-<div className="flex justify-between">
-
- <span>Show Dashboard Banner</span>
-
- <input
-
-  type="checkbox"
-
-  checked={showBanner}
-
-  onChange={()=>
-   setShowBanner(
-    !showBanner
-   )
-  }
-
- />
-
-</div>
-
-<div className="flex justify-between">
-
- <span>Show Analytics Widgets</span>
-
- <input
-
-  type="checkbox"
-
-  checked={showAnalytics}
-
-  onChange={()=>
-   setShowAnalytics(
-    !showAnalytics
-   )
-  }
-
- />
-
-</div>
-
-<select
- className="
- w-full
- border
- rounded-xl
- p-3
- "
->
-
- <option>
-  Analyst View
- </option>
-
- <option>
-  Manager View
- </option>
-
- <option>
-  Executive View
- </option>
-
-</select>
-
-</div>
-
-    </div>
-
-    {/* AI */}
-    <div className="bg-white rounded-2xl shadow p-6">
-
-     <h2 className="text-xl font-bold mb-4">
-      🤖 AI Settings
-     </h2>
-
-    <div className="space-y-4">
-
-<div className="flex justify-between">
-
- <span>
-  AI Investigation Summary
- </span>
-
- <input
-
-  type="checkbox"
-
-  checked={aiSummaryEnabled}
-
-  onChange={()=>
-   setAiSummaryEnabled(
-    !aiSummaryEnabled
-   )
-  }
-
- />
-
-</div>
-
-<div className="flex justify-between">
-
- <span>
-  Fraud Pattern Detection
- </span>
-
- <input
-
-  type="checkbox"
-
-  checked={patternDetection}
-
-  onChange={()=>
-   setPatternDetection(
-    !patternDetection
-   )
-  }
-
- />
-
-</div>
-
-<div
- className="
- bg-indigo-50
-
- rounded-xl
-
- p-4
-
- text-sm
- "
->
-
-🤖 AI assists investigators by
-explaining risk factors and
-detecting suspicious behaviour
-patterns.
-
-</div>
-
-</div>
-
-    </div>
 
    </div>
 <button
@@ -616,6 +467,15 @@ patterns.
 💾 Save Settings
 
 </button>
+{user?.role === "ADMIN" && (
+
+    <div className="mt-6">
+
+        <RoleManagementCard />
+
+    </div>
+
+)}
 {
  showPasswordModal && (
 
@@ -784,8 +644,11 @@ Update Password
 
 </div>
 
+
  )
+ 
 }
+
   </Layout>
 
  );
