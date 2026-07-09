@@ -21,10 +21,9 @@ export default function AdminDeposits() {
   const handleAction = async (requestId: number, action: "APPROVE" | "REJECT") => {
     try {
       const token = localStorage.getItem("token");
-      await api.post("/admin/deposits/action", { requestId, action }, {
+      await api.post("/admin/deposits/action", { deposit_id: requestId, action }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      // Remove the processed request from the UI
       setRequests(requests.filter(req => req.id !== requestId));
     } catch (error) {
       console.error(error);
