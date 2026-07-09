@@ -12,7 +12,7 @@ function PageHeader({
    shadow-sm
    p-8
    mb-8
-   bg-gradient-to-r
+   bg-linear-to-r
  from-blue-600
  via-blue-700
  to-indigo-800

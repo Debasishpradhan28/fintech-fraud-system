@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
@@ -12,6 +13,7 @@ const transactionHistoryRoutes = require("./routes/transactionHistoryRoutes");
 const profileRoutes = require("./routes/profileRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const depositRoutes = require("./routes/depositRoutes");
 
 app.use(cors());
 app.use(express.json());
@@ -25,6 +27,7 @@ app.use("/api/transactions", transactionHistoryRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/deposit", depositRoutes);
 
 
 app.get("/", (req, res) => {

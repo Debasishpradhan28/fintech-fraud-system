@@ -21,6 +21,8 @@ import Investigations from "./pages/Investigations";
 import Settings from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AccessDenied from "./pages/AccessDenied";
+import AdminDeposits from "./pages/AdminDeposits";
+
 
 function App() {
 
@@ -150,7 +152,16 @@ function App() {
      path="/access-denied"
      element={<AccessDenied />}
     />
+    <Route
+     path="/admin/deposits"
+     element={
+        <ProtectedRoute roles={["ADMIN"]}>
+     <AdminDeposits />
+        </ProtectedRoute>
+     }
+    />
    </Routes>
+   
 
   </BrowserRouter>
 

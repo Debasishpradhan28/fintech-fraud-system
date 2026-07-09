@@ -13,7 +13,8 @@ const getProfile = async (req,res)=>{
   SELECT
    id,
    full_name,
-   email
+   email,
+   role
   FROM users
   WHERE id = $1
   `,
