@@ -5,14 +5,12 @@ const jwt = require("jsonwebtoken");
 const registerUser = async (req, res) => {
 
     try {
-
+        await pool.query("BEGIN");
         const {
             full_name,
             email,
             password
         } = req.body;
-
-        // Check existing user
 
         const existingUser =
             await pool.query(
@@ -27,14 +25,9 @@ const registerUser = async (req, res) => {
             });
 
         }
-
         // Hash password
-
-        const hashedPassword =
-            await bcrypt.hash(password,10);
-
+        const hashedPassword =await bcrypt.hash(password,10);
         // Save user
-
         const newUser =
             await pool.query(
                 `INSERT INTO users
@@ -47,46 +40,26 @@ const registerUser = async (req, res) => {
                     hashedPassword
                 ]
             );
-            await pool.query(
-            `
-            INSERT INTO trust_scores
-(
-    user_id,
-    score
-)
-VALUES
-(
-    $1,
-    $2
-)
-`,
-[
-    newUser.rows[0].id,
-    500
-]
-);
+            await pool.query(`INSERT INTO trust_scores(user_id,score) VALUES($1,$2)`,[newUser.rows[0].id,500]);
             const generateAccountNumber = Math.floor(1000000000 + Math.random() * 9000000000).toString();
             await pool.query(
             `INSERT INTO accounts (user_id, account_number, balance, currency) 
              VALUES ($1, $2, $3, $4)`,
              [newUser.rows[0].id, generateAccountNumber, 0.00, 'USD']
             );
+            await pool.query("COMMIT");
 
         res.status(201).json({
             success:true,
             user:newUser.rows[0]
         });
-
     } catch(error){
-
+        await pool.query("ROLLBACK");
         console.error(error);
-
         res.status(500).json({
             message:"Server Error"
         });
-
     }
-
 };
 
 const loginUser = async (req, res) => {

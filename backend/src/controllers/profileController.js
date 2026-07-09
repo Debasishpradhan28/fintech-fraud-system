@@ -98,36 +98,53 @@ const markNotificationsRead = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// backend/src/controllers/profileController.js
+
 const getBanking = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // FIX: Using LEFT JOIN and COALESCE ensures we always return valid data,
-    // even if the user's account row is completely missing from the database.
-    const result = await pool.query(
-      `
-      SELECT 
-        u.full_name, 
-        COALESCE(a.account_number, 'PROVISIONING...') as account_number, 
-        COALESCE(a.balance, 0.00) as balance, 
-        COALESCE(ts.score, 500) AS trust_score 
-      FROM users u 
-      LEFT JOIN accounts a ON u.id = a.user_id 
-      LEFT JOIN trust_scores ts ON u.id = ts.user_id 
-      WHERE u.id = $1
-      `,
+    // 1. Attempt to fetch existing account and trust score
+    let result = await pool.query(
+      `SELECT a.account_number, a.balance, ts.score as trust_score 
+       FROM accounts a 
+       LEFT JOIN trust_scores ts ON a.user_id = ts.user_id 
+       WHERE a.user_id = $1`,
       [userId]
     );
 
+    // 2. SELF-HEALING: If no account exists, create one immediately
     if (result.rows.length === 0) {
-      return res.status(404).json({ message: "User profile not found" });
+      const newAccNum = "TG" + Math.floor(1000000000 + Math.random() * 9000000000);
+      
+      // Create the missing account record
+      await pool.query(
+        "INSERT INTO accounts (user_id, account_number, balance) VALUES ($1, $2, 0.00)",
+        [userId, newAccNum]
+      );
+      
+      // Ensure trust_score exists as well
+      await pool.query(
+        "INSERT INTO trust_scores (user_id, score) VALUES ($1, 500) ON CONFLICT (user_id) DO NOTHING",
+        [userId]
+      );
+
+      // 3. Re-fetch the newly created data to ensure accurate UI display
+      result = await pool.query(
+        `SELECT a.account_number, a.balance, COALESCE(ts.score, 500) as trust_score 
+         FROM accounts a 
+         LEFT JOIN trust_scores ts ON a.user_id = ts.user_id 
+         WHERE a.user_id = $1`,
+        [userId]
+      );
     }
 
+    // 4. Return the clean data
     res.status(200).json(result.rows[0]);
 
   } catch (error) {
     console.error("GET BANKING ERROR:", error);
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Failed to load banking data." });
   }
 };
 const searchUsers = async(req,res)=>{
