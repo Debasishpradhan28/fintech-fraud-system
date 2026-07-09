@@ -3,13 +3,16 @@ const express = require("express");
 const router = express.Router();
 const auth =require("../middleware/authMiddleware");
 const verifyToken = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+
 
 const {
  getProfile,
  getBanking,
  searchUsers,
  updateProfile,
- changePassword
+ changePassword,
+ markNotificationsRead
 }
 =
 require("../controllers/profileController");
@@ -40,4 +43,5 @@ router.put(
  auth,
  changePassword
 );
+router.post('/notifications/clear', authMiddleware, markNotificationsRead);
 module.exports = router;

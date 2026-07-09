@@ -42,6 +42,11 @@ const getProfile = async (req,res)=>{
   [userId]
   );
 
+  const unseenDeposits = await pool.query(
+      `SELECT id FROM deposit_requests WHERE user_id = $1 AND status = 'APPROVED' AND is_notified = FALSE`, 
+      [userId]
+    );
+
   const logins =
   await pool.query(
   `
@@ -66,7 +71,9 @@ const getProfile = async (req,res)=>{
    devices.rows,
 
    logins:
-   logins.rows
+   logins.rows,
+
+   has_new_approved_funds: unseenDeposits.rows.length > 0
 
   });
 
@@ -78,6 +85,18 @@ const getProfile = async (req,res)=>{
 
  }
 
+};
+const markNotificationsRead = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await pool.query(
+      `UPDATE deposit_requests SET is_notified = TRUE WHERE user_id = $1 AND status = 'APPROVED'`,
+      [userId]
+    );
+    res.status(200).json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 const getBanking = async (req, res) => {
   try {
@@ -283,5 +302,6 @@ module.exports = {
  getBanking,
  searchUsers,
  updateProfile,
- changePassword
+ changePassword,
+  markNotificationsRead
 };

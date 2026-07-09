@@ -20,15 +20,18 @@ function Profile() {
       });
 
       setProfile(response.data);
-      console.log(response.data);
 
       // Trigger the fund approval notification if the user is a customer
       // Note: In production, you would tie this to a specific flag from your backend 
       // (e.g., response.data.has_new_approved_funds === true)
-      if (response.data.user?.role === "CUSTOMER") {
+      if (response.data.user?.role === "CUSTOMER" && response.data.has_new_approved_funds === true) {
         setShowNotification(true);
-        // Auto-hide notification after 6 seconds
         setTimeout(() => setShowNotification(false), 6000);
+        await api.post("/profile/notifications/clear", {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        });
       }
     } catch (error) {
       console.log(error);

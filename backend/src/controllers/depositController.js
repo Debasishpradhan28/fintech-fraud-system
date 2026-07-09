@@ -77,44 +77,40 @@ const getPendingDeposits = async (req, res) => {
 
 // 4. Admin Approves or Rejects
 const handleDepositAction = async (req, res) => {
-  const { requestId, action } = req.body; // action = 'APPROVE' or 'REJECT'
-  
+  const { deposit_id, action } = req.body;
+
   try {
-    // Start a SQL Transaction to ensure data integrity
+    // 1. Fetch the deposit details
+    const depositRes = await pool.query("SELECT * FROM deposit_requests WHERE id = $1", [deposit_id]);
+    const deposit = depositRes.rows[0];
+
+    if (!deposit) return res.status(404).json({ message: "Deposit request not found" });
+    if (deposit.status !== 'PENDING') return res.status(400).json({ message: "Deposit already processed" });
+
+    // 2. Start Transaction
     await pool.query("BEGIN");
 
-    const requestResult = await pool.query(
-      "SELECT * FROM deposit_requests WHERE id = $1 AND status = 'PENDING'",
-      [requestId]
-    );
-
-    if (requestResult.rows.length === 0) {
-      await pool.query("ROLLBACK");
-      return res.status(404).json({ message: "Request not found or already processed" });
-    }
-
-    const deposit = requestResult.rows[0];
-
-    if (action === "APPROVE") {
-      // Update status
-      await pool.query("UPDATE deposit_requests SET status = 'APPROVED' WHERE id = $1", [requestId]);
-      // Credit the user's account
+    if (action === 'APPROVE') {
+      // Step A: Update deposit status
+      await pool.query("UPDATE deposit_requests SET status = 'APPROVED' WHERE id = $1", [deposit_id]);
+      
+      // Step B: ADD MONEY TO THE ACCOUNT (This is the missing piece!)
       await pool.query(
-        "UPDATE accounts SET balance = balance + $1 WHERE user_id = $2",
+        "UPDATE accounts SET balance = balance + $1 WHERE user_id = $2", 
         [deposit.amount, deposit.user_id]
       );
-    } else if (action === "REJECT") {
-      // Update status (In production, you would also trigger razorpay.payments.refund() here)
-      await pool.query("UPDATE deposit_requests SET status = 'REJECTED' WHERE id = $1", [requestId]);
+    } else if (action === 'REJECT') {
+      await pool.query("UPDATE deposit_requests SET status = 'REJECTED' WHERE id = $1", [deposit_id]);
     }
 
+    // 3. Commit Transaction
     await pool.query("COMMIT");
-    res.status(200).json({ success: true, message: `Deposit ${action}D successfully` });
+    res.status(200).json({ success: true, message: `Deposit successfully ${action}D` });
 
   } catch (error) {
-    await pool.query("ROLLBACK");
-    console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    await pool.query("ROLLBACK"); // Revert if anything fails
+    console.error("Action Error:", error);
+    res.status(500).json({ message: "Failed to process deposit" });
   }
 };
 
