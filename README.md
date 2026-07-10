@@ -9,9 +9,245 @@ A production-ready fintech platform that leverages Artificial Intelligence, beha
 [![Deployment](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)]()
 [![Database](https://img.shields.io/badge/Database-Neon-00E599?style=for-the-badge)]()
 [![Payments](https://img.shields.io/badge/Payments-Razorpay-0C73FE?style=for-the-badge)]()
-[![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)]()
 
+# 🌐 Live Demo
 
+| Platform | Link |
+|----------|------|
+| 🚀 Frontend | https://fintech-fraud-system-one.vercel.app |
+| ⚙ Backend API | **Coming Soon** |
+| 📚 API Documentation | **Coming Soon** |
+
+# 📖 Overview
+
+TrustGuard AI is a production-grade financial fraud detection and digital trust platform designed to simulate modern banking security systems.
+
+The platform combines **Artificial Intelligence**, **behavioral analytics**, **network graph visualization**, **role-based access control**, and **secure payment processing** to identify suspicious financial activities while providing administrators with powerful investigation tools.
+
+Unlike conventional banking dashboards, TrustGuard AI focuses on explaining **why** transactions become risky, helping analysts investigate fraud patterns through interactive graph analysis and trust scoring.
+
+---
+# ✨ Key Features
+
+## 🔐 Authentication & Authorization
+
+- Secure JWT Authentication
+- Password Encryption using BCrypt
+- Protected REST APIs
+- Persistent User Sessions
+- Role-Based Access Control (RBAC)
+- Secure Logout
+
+---
+## 👥 Role-Based Access Control
+
+Three independent user roles are supported.
+
+### 👤 Customer
+
+- View Profile
+- Manage Banking Account
+- Deposit Funds
+- Transfer Money
+- Transaction History
+- Settings
+
+---
+
+### 🕵 Analyst
+
+- Fraud Dashboard
+- Transaction Monitoring
+- Analytics Dashboard
+- Fraud Investigation
+- Network Graph Analysis
+- Risk Monitoring
+
+---
+
+### 👑 Administrator
+
+- Complete Platform Access
+- Manage Analysts
+- Grant / Revoke Roles
+- Banking Management
+- Fraud Investigation
+- Analytics
+- User Management
+
+---
+
+# 💳 Banking Module
+
+- Secure Banking Dashboard
+- Auto-generated Account Numbers
+- Balance Management
+- Deposit Funds
+- Razorpay Payment Integration
+- Recent Recipients
+- Money Transfer
+- Transaction History
+- Trust Score Display
+
+---
+
+# 🧠 AI Fraud Detection
+
+- Trust Score Engine
+- Behavioral Analysis
+- Suspicious Transaction Detection
+- Risk Score Calculation
+- Device Intelligence
+- Login Monitoring
+- Transaction Pattern Analysis
+- Fraud Alert Generation
+
+---
+
+# 🌐 Interactive Fraud Network Graph
+
+Visual investigation dashboard providing
+
+- Relationship Graph
+- Interactive Account Nodes
+- Transaction Links
+- Risk Visualization
+- Investigation Timeline
+- AI Investigation Summary
+- Pattern Detection
+- Transaction Flow Explorer
+
+---
+
+# 📊 Analytics Dashboard
+
+Interactive analytical insights including
+
+- Risk Distribution
+- Trust Distribution
+- Transaction Trends
+- Fraud Trends
+- High Risk Users
+- Financial Statistics
+
+---
+
+# 💰 Secure Fund Deposit
+
+The latest banking module introduces secure online deposits using **Razorpay**.
+
+### Features
+
+- Add Funds Securely
+- Razorpay Checkout Integration
+- Server-side Payment Verification
+- Instant Balance Update
+- Transaction Recording
+- Protected Payment APIs
+
+---
+
+# 🏗 Production Architecture
+
+```text
+                 ┌────────────────────────────┐
+                 │        React Frontend      │
+                 │    TypeScript + Vite       │
+                 └─────────────┬──────────────┘
+                               │
+                     REST API (JWT)
+                               │
+                 ┌─────────────▼──────────────┐
+                 │     Express.js Backend     │
+                 │ Business Logic & Security  │
+                 └─────────────┬──────────────┘
+                               │
+                 PostgreSQL Queries
+                               │
+                 ┌─────────────▼──────────────┐
+                 │     Neon PostgreSQL        │
+                 └─────────────┬──────────────┘
+                               │
+         ┌─────────────────────┼────────────────────┐
+         │                     │                    │
+    Razorpay API         AI Services         External APIs
+```
+
+---
+
+# 📊 System Metrics
+
+| Module | Status |
+|---------|--------|
+| Authentication | ✅ |
+| Banking | ✅ |
+| Fund Deposit | ✅ |
+| Money Transfer | ✅ |
+| Fraud Detection | ✅ |
+| Trust Score Engine | ✅ |
+| Analytics Dashboard | ✅ |
+| Fraud Investigation | ✅ |
+| Network Graph | ✅ |
+| Role Management | ✅ |
+| Admin Console | ✅ |
+| Secure Payments | ✅ |
+
+---
+
+# 🛠 Technology Stack
+
+## Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Framer Motion
+- React Router
+- Axios
+- React Icons
+
+---
+
+## Backend
+
+- Node.js
+- Express.js
+- JWT Authentication
+- BCrypt
+- REST APIs
+
+---
+
+## Database
+
+- PostgreSQL
+- Neon Database
+
+---
+
+## Deployment
+
+| Service | Platform |
+|----------|----------|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | Neon |
+
+---
+
+## Payment Gateway
+
+- Razorpay
+
+---
+
+## External APIs
+
+- Razorpay Payment API
+- *(Add remaining APIs here)*
+
+---
 
 
 
