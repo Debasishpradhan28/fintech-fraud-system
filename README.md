@@ -1,6 +1,13 @@
+<div align="center">
+
 # 🛡️ TrustGuard 
 ### *AI-Powered Real-Time Financial Trust & Fraud Prevention Platform*
+
+<p align="center">
+
 A production-ready fintech platform that leverages Artificial Intelligence, behavioral analytics, graph intelligence, and secure payment processing to detect fraudulent activities, monitor financial risk, and strengthen digital trust in modern banking systems.
+
+</p>
 
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-61DAFB?style=for-the-badge&logo=react)]()
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-339933?style=for-the-badge&logo=node.js)]()
@@ -12,11 +19,7 @@ A production-ready fintech platform that leverages Artificial Intelligence, beha
 
 # 🌐 Live Demo
 
-| Platform | Link |
-|----------|------|
 | 🚀 Frontend | https://fintech-fraud-system-one.vercel.app |
-| ⚙ Backend API | **Coming Soon** |
-| 📚 API Documentation | **Coming Soon** |
 
 # 📖 Overview
 
@@ -41,41 +44,9 @@ Unlike conventional banking dashboards, TrustGuard AI focuses on explaining **wh
 ---
 ## 👥 Role-Based Access Control
 
-Three independent user roles are supported.
+- Customer , Analyst , Admin
 
-### 👤 Customer
-
-- View Profile
-- Manage Banking Account
-- Deposit Funds
-- Transfer Money
-- Transaction History
-- Settings
-
----
-
-### 🕵 Analyst
-
-- Fraud Dashboard
-- Transaction Monitoring
-- Analytics Dashboard
-- Fraud Investigation
-- Network Graph Analysis
-- Risk Monitoring
-
----
-
-### 👑 Administrator
-
-- Complete Platform Access
-- Manage Analysts
-- Grant / Revoke Roles
-- Banking Management
-- Fraud Investigation
-- Analytics
-- User Management
-
----
+  ---
 
 # 💳 Banking Module
 
@@ -124,11 +95,8 @@ Visual investigation dashboard providing
 Interactive analytical insights including
 
 - Risk Distribution
-- Trust Distribution
 - Transaction Trends
-- Fraud Trends
 - High Risk Users
-- Financial Statistics
 
 ---
 
@@ -139,8 +107,6 @@ The latest banking module introduces secure online deposits using **Razorpay**.
 ### Features
 
 - Add Funds Securely
-- Razorpay Checkout Integration
-- Server-side Payment Verification
 - Instant Balance Update
 - Transaction Recording
 - Protected Payment APIs
@@ -175,38 +141,14 @@ The latest banking module introduces secure online deposits using **Razorpay**.
 
 ---
 
-# 📊 System Metrics
-
-| Module | Status |
-|---------|--------|
-| Authentication | ✅ |
-| Banking | ✅ |
-| Fund Deposit | ✅ |
-| Money Transfer | ✅ |
-| Fraud Detection | ✅ |
-| Trust Score Engine | ✅ |
-| Analytics Dashboard | ✅ |
-| Fraud Investigation | ✅ |
-| Network Graph | ✅ |
-| Role Management | ✅ |
-| Admin Console | ✅ |
-| Secure Payments | ✅ |
-
----
-
 # 🛠 Technology Stack
 
 ## Frontend
 
 - React
 - TypeScript
-- Vite
-- Tailwind CSS
-- Framer Motion
-- React Router
+- Tailwind CSS,Framer Motion
 - Axios
-- React Icons
-
 ---
 
 ## Backend
@@ -236,16 +178,9 @@ The latest banking module introduces secure online deposits using **Razorpay**.
 
 ---
 
-## Payment Gateway
-
-- Razorpay
-
----
-
 ## External APIs
 
 - Razorpay Payment API
-- *(Add remaining APIs here)*
 
 ---
 # ⚙️ Local Installation
@@ -314,24 +249,6 @@ http://localhost:5000
 ```
 
 ---
-# 🗄 Database Overview
-
-The application uses **PostgreSQL (Neon Database)** for production and **Local PostgreSQL** during development.
-
-### Core Tables
-
-| Table | Purpose |
-|--------|----------|
-| users | Stores user information |
-| accounts | Banking account details |
-| trust_scores | AI trust score records |
-| transactions | Money transfers |
-| fraud_alerts | Fraud detection records |
-| behavior_logs | User behaviour tracking |
-| login_activity | Login history |
-| devices | Registered user devices |
-
----
 # 🔐 Authentication Workflow
 
 ```text
@@ -375,67 +292,10 @@ Dashboard
 ```
 
 ---
-# 👥 Role-Based Access Control
-
-| Module | Customer | Analyst | Admin |
-|---------|----------|----------|--------|
-| Dashboard | ✅ | ✅ | ✅ |
-| Banking | ✅ | ❌ | ✅ |
-| Deposit Funds | ✅ | ❌ | ✅ |
-| Transfer Money | ✅ | ❌ | ✅ |
-| Transaction History | ✅ | ❌ | ✅ |
-| Fraud Investigation | ❌ | ✅ | ✅ |
-| Analytics | ❌ | ✅ | ✅ |
-| Network Graph | ❌ | ✅ | ✅ |
-| Manage Analysts | ❌ | ❌ | ✅ |
-| Role Management | ❌ | ❌ | ✅ |
-
----
-Deployment follows a production-ready architecture.
-
-```text
-GitHub
-
-     │
-
-     ▼
-
-Vercel (Frontend)
-
-     │
-
- REST APIs
-
-     ▼
-
-Render Backend
-
-     │
-
- PostgreSQL
-
-     ▼
-
-Neon Database
-```
-
----
 # 🧪 Testing
 
 TrustGuard AI has been tested across multiple functional modules to ensure reliability, security, and consistent user experience.
 
-## Authentication Testing
-
-- ✅ User Registration
-- ✅ User Login
-- ✅ JWT Authentication
-- ✅ Password Hashing (BCrypt)
-- ✅ Invalid Credentials Handling
-- ✅ Duplicate Email Validation
-- ✅ Session Persistence
-- ✅ Logout
-
----
 # 🔒 Security Features
 
 TrustGuard AI follows multiple security practices inspired by modern financial systems.
@@ -599,19 +459,19 @@ Passionate about
 
 **GitHub**
 
-> *(Add GitHub Profile Link)*
+> https://github.com/Debasishpradhan28
 
 **LinkedIn**
 
-> *(Add LinkedIn Profile Link)*
+> https://www.linkedin.com/in/debasish-pradhan-185508312
 
-**Portfolio**
+**Portfolio - Github**
 
-> *(Add Portfolio Link)*
+> https://github.com/Debasishpradhan28/fintech-fraud-system
 
 **Email**
 
-> *(Add Email Address)*
+> debasishpradhan236@gmail.com
 
 ---
 
@@ -625,7 +485,7 @@ It motivates future development and helps others discover the project.
 
 ---
 
-### 🛡️ TrustGuard AI
+### 🛡️ TrustGuard
 
 **Building Intelligent Financial Security with Artificial Intelligence**
 
