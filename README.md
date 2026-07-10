@@ -1,14 +1,9 @@
-<div align="center">
-
 # 🛡️ TrustGuard 
 ### *AI-Powered Real-Time Financial Trust & Fraud Prevention Platform*
 
-<p align="center">
 
 A production-ready fintech platform that leverages Artificial Intelligence, behavioral analytics, graph intelligence, and secure payment processing to detect fraudulent activities, monitor financial risk, and strengthen digital trust in modern banking systems.
 
-</p>
-</div>
 
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20TypeScript-61DAFB?style=for-the-badge&logo=react)]()
 [![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-339933?style=for-the-badge&logo=node.js)]()
@@ -20,7 +15,7 @@ A production-ready fintech platform that leverages Artificial Intelligence, beha
 
 # 🌐 Live Demo
 
-| 🚀 Frontend | https://fintech-fraud-system-one.vercel.app |
+🚀 Frontend | https://fintech-fraud-system-one.vercel.app |
 
 # 📖 Overview
 
