@@ -248,17 +248,389 @@ The latest banking module introduces secure online deposits using **Razorpay**.
 - *(Add remaining APIs here)*
 
 ---
+# ⚙️ Local Installation
+
+## Prerequisites
+
+Ensure the following software is installed.
+
+- Node.js >= 18
+- npm
+- PostgreSQL
+- Git
+
+---
+
+## Clone Repository
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY>
+
+cd TrustGuard-AI
+```
+
+---
+
+## Install Frontend
+
+```bash
+cd frontend
+
+npm install
+```
+
+Run development server
+
+```bash
+npm run dev
+```
+
+Frontend will start at
+
+```text
+http://localhost:5173
+```
+
+---
+
+## Install Backend
+
+```bash
+cd backend
+
+npm install
+```
+
+Run server
+
+```bash
+npm run dev
+```
+
+Backend will start at
+
+```text
+http://localhost:5000
+```
+
+---
+# 🗄 Database Overview
+
+The application uses **PostgreSQL (Neon Database)** for production and **Local PostgreSQL** during development.
+
+### Core Tables
+
+| Table | Purpose |
+|--------|----------|
+| users | Stores user information |
+| accounts | Banking account details |
+| trust_scores | AI trust score records |
+| transactions | Money transfers |
+| fraud_alerts | Fraud detection records |
+| behavior_logs | User behaviour tracking |
+| login_activity | Login history |
+| devices | Registered user devices |
+
+---
+# 🔐 Authentication Workflow
+
+```text
+User Login
+
+      │
+
+      ▼
+
+Email + Password
+
+      │
+
+      ▼
+
+BCrypt Verification
+
+      │
+
+      ▼
+
+JWT Generation
+
+      │
+
+      ▼
+
+Protected APIs
+
+      │
+
+      ▼
+
+Role Validation
+
+      │
+
+      ▼
+
+Dashboard
+```
+
+---
+# 👥 Role-Based Access Control
+
+| Module | Customer | Analyst | Admin |
+|---------|----------|----------|--------|
+| Dashboard | ✅ | ✅ | ✅ |
+| Banking | ✅ | ❌ | ✅ |
+| Deposit Funds | ✅ | ❌ | ✅ |
+| Transfer Money | ✅ | ❌ | ✅ |
+| Transaction History | ✅ | ❌ | ✅ |
+| Fraud Investigation | ❌ | ✅ | ✅ |
+| Analytics | ❌ | ✅ | ✅ |
+| Network Graph | ❌ | ✅ | ✅ |
+| Manage Analysts | ❌ | ❌ | ✅ |
+| Role Management | ❌ | ❌ | ✅ |
+
+---
+Deployment follows a production-ready architecture.
+
+```text
+GitHub
+
+     │
+
+     ▼
+
+Vercel (Frontend)
+
+     │
+
+ REST APIs
+
+     ▼
+
+Render Backend
+
+     │
+
+ PostgreSQL
+
+     ▼
+
+Neon Database
+```
+
+---
+# 🧪 Testing
+
+TrustGuard AI has been tested across multiple functional modules to ensure reliability, security, and consistent user experience.
+
+## Authentication Testing
+
+- ✅ User Registration
+- ✅ User Login
+- ✅ JWT Authentication
+- ✅ Password Hashing (BCrypt)
+- ✅ Invalid Credentials Handling
+- ✅ Duplicate Email Validation
+- ✅ Session Persistence
+- ✅ Logout
+
+---
+# 🔒 Security Features
+
+TrustGuard AI follows multiple security practices inspired by modern financial systems.
+
+### Authentication
+
+- JWT Authentication
+- BCrypt Password Hashing
+- Protected API Routes
+- Session Validation
+
+---
+### Authorization
+
+- Role-Based Access Control
+- Middleware-Level Authorization
+- Route Protection
+- Secure Dashboard Access
+
+---
+
+### Banking Security
+
+- Secure Payment Verification
+- Server-side Razorpay Validation
+- Protected Banking APIs
+- Account Ownership Validation
+
+---
+
+### Data Protection
+
+- Parameterized SQL Queries
+- Password Encryption
+- Environment Variables
+- Secure API Communication
+
+---
+# 📌 Future Roadmap
+
+The following features are planned for future releases.
+
+### AI Features
+
+- AI-powered Fraud Explanation
+- LLM Assisted Investigation
+- Fraud Prediction Engine
+---
+
+### Banking
+
+- QR Code Payments
+- Scheduled Transfers
+- Beneficiary Management
+- Account Statements (PDF)
+---
+
+### Security
+
+- Two Factor Authentication (2FA)
+- OTP Verification
+- Email Notifications
+- SMS Alerts
+- Biometric Login
+
+---
+
+### Administration
+
+- User Activity Logs
+- System Audit Logs
+- Admin Notifications
+- Case Management System
+
+---
+
+### Platform
+
+- Mobile Application
+- Docker Deployment
+- Kubernetes Support
+- CI/CD Pipeline
+- Microservice Architecture
+
+---
+# 📚 Learning Outcomes
+
+This project helped strengthen practical knowledge in:
+
+- Full Stack Development
+- REST API Design
+- PostgreSQL Database Design
+- Authentication & Authorization
+- Banking System Architecture
+- AI-based Fraud Detection
+- Graph Visualization
+- Payment Gateway Integration
+- Production Deployment
+- Software Architecture
+- Secure Coding Practices
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+If you'd like to improve TrustGuard AI:
+
+1. Fork the repository
+
+2. Create a new branch
+
+```bash
+git checkout -b feature/NewFeature
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Add New Feature"
+```
+
+4. Push your branch
+
+```bash
+git push origin feature/NewFeature
+```
+
+5. Open a Pull Request
+
+---
+
+# 🐞 Reporting Issues
+
+If you discover a bug or have a feature request, please open an issue describing:
+
+- Problem Description
+- Expected Behaviour
+- Steps to Reproduce
+- Screenshots (if applicable)
+
+---
+# 👨‍💻 Developer
+
+## Debasish Pradhan
+
+Computer Science & Engineering Student
+
+Passionate about
+
+- Artificial Intelligence
+- Full Stack Development
+- Cyber Security
+- Financial Technology
+- Problem Solving
+
+---
+
+## 📬 Contact
+
+**GitHub**
+
+> *(Add GitHub Profile Link)*
+
+**LinkedIn**
+
+> *(Add LinkedIn Profile Link)*
+
+**Portfolio**
+
+> *(Add Portfolio Link)*
+
+**Email**
+
+> *(Add Email Address)*
+
+---
+
+<div align="center">
+
+# ⭐ If you found this project useful
+
+Please consider giving it a **Star ⭐** on GitHub.
+
+It motivates future development and helps others discover the project.
+
+---
+
+### 🛡️ TrustGuard AI
+
+**Building Intelligent Financial Security with Artificial Intelligence**
+
+Made with ❤️ by **Debasish Pradhan**
+
+</div>
 
 
-
-
-
-
-
-
-
-
-
-
-deployed link - 
-https://fintech-fraud-system-one.vercel.app
