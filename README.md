@@ -49,8 +49,7 @@ Unlike conventional banking dashboards, TrustGuard AI focuses on explaining **wh
 - Secure Banking Dashboard
 - Auto-generated Account Numbers
 - Balance Management
-- Deposit Funds
-- Razorpay Payment Integration
+- Deposit Funds with Razorpay Integration
 - Recent Recipients
 - Money Transfer
 - Transaction History
