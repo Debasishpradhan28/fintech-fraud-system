@@ -48,7 +48,7 @@ function DashboardBanner() {
 
   return (
     <div
-      className={`relative h-60 overflow-hidden rounded-3xl bg-gradient-to-r ${banners[current].bg} text-white shadow-xl`}
+      className={`relative h-60 overflow-hidden rounded-3xl bg-linear-to-r ${banners[current].bg} text-white shadow-xl`}
     >
       <div className="absolute inset-0 bg-black/10" />
 
