@@ -1,352 +1,225 @@
 import {
-    forwardRef,
-    useEffect,
-    useImperativeHandle,
-    useMemo,
-    useRef,
-    useState
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
 } from "react";
 
 import ForceGraph2D from "react-force-graph-2d";
 
+export interface NetworkNode {
+  id: string;
 
+  label: string;
 
-/* ===========================
-   TYPES
-=========================== */
+  type?: "MAIN" | "CONNECTED";
 
-export interface NetworkNode{
+  riskScore?: number;
 
-    id:string;
+  trustScore?: number;
 
-    label:string;
+  connections?: number;
 
-    type?:"MAIN"|"CONNECTED";
+  totalSent?: number;
 
-    riskScore?:number;
-
-    trustScore?:number;
-
-    connections?:number;
-
-    totalSent?:number;
-
-    totalReceived?:number;
-
+  totalReceived?: number;
 }
 
-export interface NetworkEdge{
+export interface NetworkEdge {
+  id: string;
 
-    id:string;
+  source: string;
 
-    source:string;
+  target: string;
 
-    target:string;
+  amount: number;
 
-    amount:number;
+  risk: number;
 
-    risk:number;
-
-    created_at?:string;
-
+  created_at?: string;
 }
 
+export interface GraphMethods {
+  zoomIn: () => void;
 
+  zoomOut: () => void;
 
-export interface GraphMethods{
+  center: () => void;
 
-    zoomIn:()=>void;
-
-    zoomOut:()=>void;
-
-    center:()=>void;
-
-    reset:()=>void;
-
+  reset: () => void;
 }
 
+interface Props {
+  nodes: NetworkNode[];
 
+  edges: NetworkEdge[];
 
-interface Props{
+  selectedNode: any;
 
-    nodes:NetworkNode[];
-
-    edges:NetworkEdge[];
-
-    selectedNode:any;
-
-    setSelectedNode:(node:any)=>void;
-
+  setSelectedNode: (node: any) => void;
 }
 
+const FraudNetworkGraph = forwardRef<GraphMethods, Props>(
+  (
+    {
+      nodes,
 
+      edges,
 
-/* ===========================
-   COMPONENT
-=========================== */
+      selectedNode,
 
-const FraudNetworkGraph = forwardRef<GraphMethods,Props>(({
-
-    nodes,
-
-    edges,
-
-    selectedNode,
-
-    setSelectedNode
-
-},ref)=>{
-
+      setSelectedNode,
+    },
+    ref,
+  ) => {
     const graphRef = useRef<any>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const [graphSize,setGraphSize]=useState({
+    const [graphSize, setGraphSize] = useState({
+      width: 900,
 
-        width:900,
-
-        height:650
-
+      height: 650,
     });
 
+    useEffect(() => {
+      if (!containerRef.current) return;
 
+      const resize = () => {
+        setGraphSize({
+          width: containerRef.current!.clientWidth,
 
+          height: 650,
+        });
+      };
 
-    /* ===========================
-       RESPONSIVE
-    =========================== */
+      resize();
 
-    useEffect(()=>{
+      window.addEventListener("resize", resize);
 
-        if(!containerRef.current) return;
+      return () => {
+        window.removeEventListener("resize", resize);
+      };
+    }, []);
 
-        const resize=()=>{
-
-            setGraphSize({
-
-                width:containerRef.current!.clientWidth,
-
-                height:650
-
-            });
-
-        };
-
-        resize();
-
-        window.addEventListener("resize",resize);
-
-        return()=>{
-
-            window.removeEventListener("resize",resize);
-
-        };
-
-    },[]);
-
-
-
-
-    /* ===========================
-       GRAPH DATA
-    =========================== */
-
-    const graphData=useMemo(()=>({
-
+    const graphData = useMemo(
+      () => ({
         nodes,
 
-        links:edges
+        links: edges,
+      }),
+      [nodes, edges],
+    );
 
-    }),[nodes,edges]);
+    useEffect(() => {
+      if (!graphRef.current || nodes.length === 0) return;
 
+      const timer = setTimeout(() => {
+        graphRef.current.zoomToFit(
+          1000,
 
+          80,
+        );
+      }, 700);
 
+      return () => clearTimeout(timer);
+    }, [nodes]);
 
-    /* ===========================
-       INITIAL FIT
-    =========================== */
+    useImperativeHandle(ref, () => ({
+      zoomIn() {
+        if (!graphRef.current) return;
 
-    useEffect(()=>{
+        graphRef.current.zoom(
+          graphRef.current.zoom() * 1.25,
 
-        if(
+          500,
+        );
+      },
 
-            !graphRef.current ||
+      zoomOut() {
+        if (!graphRef.current) return;
 
-            nodes.length===0
+        graphRef.current.zoom(
+          graphRef.current.zoom() * 0.75,
 
-        ) return;
+          500,
+        );
+      },
 
-        const timer=setTimeout(()=>{
+      center() {
+        if (!graphRef.current) return;
 
-            graphRef.current.zoomToFit(
+        graphRef.current.zoomToFit(
+          800,
 
-                1000,
+          80,
+        );
+      },
 
-                80
+      reset() {
+        if (!graphRef.current) return;
 
-            );
+        graphRef.current.zoomToFit(
+          800,
 
-        },700);
-
-        return()=>clearTimeout(timer);
-
-    },[nodes]);
-
-
-
-
-    /* ===========================
-       GRAPH CONTROLS
-    =========================== */
-
-    useImperativeHandle(ref,()=>({
-
-        zoomIn(){
-
-            if(!graphRef.current) return;
-
-            graphRef.current.zoom(
-
-                graphRef.current.zoom()*1.25,
-
-                500
-
-            );
-
-        },
-
-        zoomOut(){
-
-            if(!graphRef.current) return;
-
-            graphRef.current.zoom(
-
-                graphRef.current.zoom()*0.75,
-
-                500
-
-            );
-
-        },
-
-        center(){
-
-            if(!graphRef.current) return;
-
-            graphRef.current.zoomToFit(
-
-                800,
-
-                80
-
-            );
-
-        },
-
-        reset(){
-
-            if(!graphRef.current) return;
-
-            graphRef.current.zoomToFit(
-
-                800,
-
-                80
-
-            );
-
-        }
-
+          80,
+        );
+      },
     }));
 
+    const getNodeColor = (node: any) => {
+      if (node.type === "MAIN") return "#2563eb";
 
+      if (node.riskScore >= 120) return "#dc2626";
 
-    /* ===========================
-       HELPERS
-    =========================== */
+      if (node.riskScore >= 70) return "#f59e0b";
 
-    const getNodeColor=(node:any)=>{
-
-        if(node.type==="MAIN")
-            return "#2563eb";
-
-        if(node.riskScore>=120)
-            return "#dc2626";
-
-        if(node.riskScore>=70)
-            return "#f59e0b";
-
-        return "#22c55e";
-
+      return "#22c55e";
     };
 
+    const getNodeRadius = (node: any) => {
+      if (node.type === "MAIN") return 18;
 
-
-    const getNodeRadius=(node:any)=>{
-
-        if(node.type==="MAIN")
-            return 18;
-
-        if(node.connections){
-
-            return Math.min(
-
-                14,
-
-                8+node.connections
-
-            );
-
-        }
-
-        return 10;
-
-    };
-
-
-
-    const getLinkWidth=(link:any)=>{
-
+      if (node.connections) {
         return Math.min(
+          14,
 
-            8,
-
-            Math.max(
-
-                2,
-
-                Number(link.amount)/25000
-
-            )
-
+          8 + node.connections,
         );
+      }
 
+      return 10;
     };
 
+    const getLinkWidth = (link: any) => {
+      return Math.min(
+        8,
 
+        Math.max(
+          2,
 
-    const getLinkColor=(link:any)=>{
-
-        if(link.risk>=120)
-            return "#dc2626";
-
-        if(link.risk>=70)
-            return "#f59e0b";
-
-        return "#94a3b8";
-
+          Number(link.amount) / 25000,
+        ),
+      );
     };
-        return (
+
+    const getLinkColor = (link: any) => {
+      if (link.risk >= 120) return "#dc2626";
+
+      if (link.risk >= 70) return "#f59e0b";
+
+      return "#94a3b8";
+    };
+    return (
+      <div
+        ref={containerRef}
+        className="relative w-full h-full bg-slate-50 rounded-3xl overflow-hidden"
+      >
 
         <div
-            ref={containerRef}
-            className="relative w-full h-full bg-slate-50 rounded-3xl overflow-hidden"
-        >
-
-            {/* Legend */}
-
-            <div
-                className="
+          className="
                 absolute
                 top-5
                 left-5
@@ -367,203 +240,157 @@ const FraudNetworkGraph = forwardRef<GraphMethods,Props>(({
 
                 space-y-2
                 "
-            >
+        >
+          <h3 className="font-bold text-slate-700">Graph Legend</h3>
 
-                <h3 className="font-bold text-slate-700">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-blue-600"></span>
+            Main Account
+          </div>
 
-                    Graph Legend
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-red-500"></span>
+            High Risk
+          </div>
 
-                </h3>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-amber-500"></span>
+            Medium Risk
+          </div>
 
-                <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-green-500"></span>
+            Normal
+          </div>
+        </div>
 
-                    <span className="w-3 h-3 rounded-full bg-blue-600"></span>
+        <ForceGraph2D
+          ref={graphRef}
 
-                    Main Account
+          width={graphSize.width}
 
-                </div>
+          height={graphSize.height}
 
-                <div className="flex items-center gap-2">
+          graphData={graphData}
 
-                    <span className="w-3 h-3 rounded-full bg-red-500"></span>
+          backgroundColor="#f8fafc"
 
-                    High Risk
+          cooldownTicks={80}
 
-                </div>
+          d3AlphaDecay={0.08}
 
-                <div className="flex items-center gap-2">
+          d3VelocityDecay={0.45}
 
-                    <span className="w-3 h-3 rounded-full bg-amber-500"></span>
+          nodeRelSize={8}
 
-                    Medium Risk
+          enableNodeDrag
 
-                </div>
+          enableZoomInteraction
 
-                <div className="flex items-center gap-2">
+          enablePanInteraction
 
-                    <span className="w-3 h-3 rounded-full bg-green-500"></span>
+          linkDirectionalArrowLength={8}
 
-                    Normal
+          linkDirectionalArrowRelPos={1}
 
-                </div>
+          linkCurvature={0.15}
 
-            </div>
+          onNodeClick={(node: any) => {
+            setSelectedNode({
+              id: node.id,
+              label: node.label,
+              type: node.type,
+              riskScore: node.riskScore,
+              connections: node.connections,
+              totalSent: node.totalSent,
+              totalReceived: node.totalReceived,
+              trustScore: node.trustScore,
+            });
+          }}
 
-            <ForceGraph2D
+          nodeCanvasObject={(node: any, ctx, scale) => {
+            const radius = getNodeRadius(node);
 
-                ref={graphRef}
+            const color = getNodeColor(node);
 
-                width={graphSize.width}
+            ctx.beginPath();
 
-                height={graphSize.height}
+            ctx.arc(
+              node.x,
 
-                graphData={graphData}
+              node.y,
 
-                backgroundColor="#f8fafc"
+              radius,
 
-                cooldownTicks={80}
+              0,
 
-                d3AlphaDecay={0.08}
+              Math.PI * 2,
+            );
 
-                d3VelocityDecay={0.45}
+            ctx.fillStyle = color;
 
-                nodeRelSize={8}
+            ctx.shadowBlur = node === selectedNode ? 25 : 10;
 
-                enableNodeDrag
+            ctx.shadowColor = color;
 
-                enableZoomInteraction
+            ctx.fill();
 
-                enablePanInteraction
+            ctx.shadowBlur = 0;
 
-                linkDirectionalArrowLength={8}
+            ctx.lineWidth = node === selectedNode ? 4 : 2;
 
-                linkDirectionalArrowRelPos={1}
+            ctx.strokeStyle = "#ffffff";
 
-                linkCurvature={0.15}
+            ctx.stroke();
 
-                onNodeClick={(node:any)=>{
+            ctx.fillStyle = "#111827";
 
-                    setSelectedNode({
-                       id: node.id,
-                       label: node.label,
-                       type: node.type,
-                       riskScore: node.riskScore,
-                       connections: node.connections,
-                       totalSent: node.totalSent,
-                      totalReceived: node.totalReceived,
-                       trustScore: node.trustScore
-                    });
+            ctx.font = `${12 / scale}px Inter`;
 
-                }}
+            ctx.fillText(
+              node.label,
 
-                nodeCanvasObject={(node:any,ctx,scale)=>{
+              node.x + radius + 5,
 
-                    const radius=getNodeRadius(node);
+              node.y + 4,
+            );
+          }}
 
-                    const color=getNodeColor(node);
+          linkColor={(link: any) => getLinkColor(link)}
 
-                    ctx.beginPath();
+          linkWidth={(link: any) => getLinkWidth(link)}
 
-                    ctx.arc(
-
-                        node.x,
-
-                        node.y,
-
-                        radius,
-
-                        0,
-
-                        Math.PI*2
-
-                    );
-
-                    ctx.fillStyle=color;
-
-                    ctx.shadowBlur=node===selectedNode ? 25 : 10;
-
-                    ctx.shadowColor=color;
-
-                    ctx.fill();
-
-                    ctx.shadowBlur=0;
-
-                    ctx.lineWidth=node===selectedNode ? 4 : 2;
-
-                    ctx.strokeStyle="#ffffff";
-
-                    ctx.stroke();
-
-                    ctx.fillStyle="#111827";
-
-                    ctx.font=`${12/scale}px Inter`;
-
-                    ctx.fillText(
-
-                        node.label,
-
-                        node.x+radius+5,
-
-                        node.y+4
-
-                    );
-
-                }}
-
-                linkColor={(link:any)=>
-
-                    getLinkColor(link)
-
-                }
-
-                linkWidth={(link:any)=>
-
-                    getLinkWidth(link)
-
-                }
-
-                linkLabel={(link:any)=>
-
-`Transaction
+          linkLabel={(link: any) =>
+            `Transaction
 
 ₹${Number(link.amount).toLocaleString()}
 
 Risk Score : ${link.risk}`
+          }
 
-                }
-
-                nodeLabel={(node:any)=>
-
-`${node.label}
+          nodeLabel={(node: any) =>
+            `${node.label}
 
 Risk : ${node.riskScore ?? 0}
 
 Connections : ${node.connections ?? 0}
 
 Trust : ${node.trustScore ?? "--"}`
+          }
 
-                }
+          onEngineStop={() => {
+            graphRef.current?.zoomToFit(
+              1000,
 
-                onEngineStop={()=>{
-
-                    graphRef.current?.zoomToFit(
-
-                        1000,
-
-                        80
-
-                    );
-
-                }}
-
-            />
-
-        </div>
-
+              80,
+            );
+          }}
+        />
+      </div>
     );
+  },
+);
 
-});
-
-FraudNetworkGraph.displayName="FraudNetworkGraph";
+FraudNetworkGraph.displayName = "FraudNetworkGraph";
 
 export default FraudNetworkGraph;

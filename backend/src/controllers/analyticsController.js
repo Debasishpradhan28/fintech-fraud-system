@@ -1,13 +1,9 @@
 const pool = require("../config/db");
 
-const getRiskDistribution =
-async(req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getRiskDistribution = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
 
   CASE
@@ -27,57 +23,40 @@ async(req,res)=>{
   FROM transactions
 
   GROUP BY risk_level
-  `
-  );
+  `,
+    );
 
-  res.json(
-   result.rows
-  );
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getTransactionTrends = async (req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getTransactionTrends = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
   DATE(created_at) as day,
   COUNT(*) as count
   FROM transactions
   GROUP BY day
   ORDER BY day
-  `
-  );
+  `,
+    );
 
-  res.json(result.rows);
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getTrustDistribution =
-async (req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getTrustDistribution = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
   CASE
    WHEN score < 450
@@ -94,28 +73,20 @@ async (req,res)=>{
   FROM trust_scores
 
   GROUP BY range
-  `
-  );
+  `,
+    );
 
-  res.json(result.rows);
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getFraudTrend =
-async(req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getFraudTrend = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
 
    DATE(
@@ -133,30 +104,20 @@ async(req,res)=>{
   GROUP BY day
 
   ORDER BY day
-  `
-  );
+  `,
+    );
 
-  res.json(
-   result.rows
-  );
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getTopRiskUsers =
-async(req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getTopRiskUsers = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
 
    u.full_name,
@@ -194,26 +155,20 @@ async(req,res)=>{
    highest_risk DESC
 
   LIMIT 5
-  `
-  );
+  `,
+    );
 
-  res.json(
-   result.rows
-  );
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 module.exports = {
- getRiskDistribution,
- getTransactionTrends,
- getTrustDistribution,
- getFraudTrend,
- getTopRiskUsers
+  getRiskDistribution,
+  getTransactionTrends,
+  getTrustDistribution,
+  getFraudTrend,
+  getTopRiskUsers,
 };

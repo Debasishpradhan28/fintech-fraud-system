@@ -1,130 +1,82 @@
 const pool = require("../config/db");
-const {
-    calculateRiskScore
-} = require("../services/riskEngine");
-const {updateTrustScore}=require( "../services/trustScoreService");
-const {
- calculateBehaviorRisk
-}
-=
-require(
- "../services/behaviorService"
-);
+const { calculateRiskScore } = require("../services/riskEngine");
+const { updateTrustScore } = require("../services/trustScoreService");
+const { calculateBehaviorRisk } = require("../services/behaviorService");
 
 const transferMoney = async (req, res) => {
+  const client = await pool.connect();
 
-    const client = await pool.connect();
+  try {
+    const { receiverAccountNumber, amount, remark } = req.body;
+    const userId = req.user.id;
 
-    try {
+    await client.query("BEGIN");
 
-        const {
-            receiverAccountNumber,
-            amount,
-            remark
-        } = req.body;
-        const userId = req.user.id;
-
-        await client.query("BEGIN");
-
-        const sender =
-await client.query(
-`
+    const sender = await client.query(
+      `
 SELECT *
 FROM accounts
 WHERE user_id = $1
 `,
-[userId]
-);
+      [userId],
+    );
 
-        if(sender.rows.length === 0){
+    if (sender.rows.length === 0) {
+      throw new Error("Sender not found");
+    }
 
-            throw new Error("Sender not found");
+    if (Number(sender.rows[0].balance) < Number(amount)) {
+      throw new Error("Insufficient balance");
+    }
 
-        }
-
-        if(
-            Number(sender.rows[0].balance)
-            < Number(amount)
-        ){
-            throw new Error(
-                "Insufficient balance"
-            );
-        }
-
-        const receiver =
-            await client.query(
-                `
+    const receiver = await client.query(
+      `
                 SELECT * FROM accounts
                 WHERE account_number = $1
                 `,
-                [receiverAccountNumber]
-            );
-            if(
- sender.rows[0].id ===
- receiver.rows[0].id
-){
+      [receiverAccountNumber],
+    );
+    if (sender.rows[0].id === receiver.rows[0].id) {
+      throw new Error("Cannot transfer to your own account");
+    }
 
- throw new Error(
-  "Cannot transfer to your own account"
- );
+    if (receiver.rows.length === 0) {
+      throw new Error("Receiver not found");
+    }
 
-}
-
-        if(receiver.rows.length === 0){
-
-            throw new Error(
-                "Receiver not found"
-            );
-
-        }
-
-        await client.query(
-            `
+    await client.query(
+      `
             UPDATE accounts
             SET balance = balance - $1
             WHERE id = $2
             `,
-            [
-                amount,
-                sender.rows[0].id
-            ]
-        );
+      [amount, sender.rows[0].id],
+    );
 
-        await client.query(
-            `
+    await client.query(
+      `
             UPDATE accounts
             SET balance = balance + $1
             WHERE id = $2
             `,
-            [
-                amount,
-                receiver.rows[0].id
-            ]
-        );
+      [amount, receiver.rows[0].id],
+    );
 
-        const transactionRef =
-            "TXN" + Date.now();
+    const transactionRef = "TXN" + Date.now();
 
-        const riskScore = calculateRiskScore(amount);
-        const behaviorRisk =
-await calculateBehaviorRisk(
-    client,
-    sender.rows[0].user_id,
-    "Windows-Chrome",
-    "Odisha"
-);
+    const riskScore = calculateRiskScore(amount);
+    const behaviorRisk = await calculateBehaviorRisk(
+      client,
+      sender.rows[0].user_id,
+      "Windows-Chrome",
+      "Odisha",
+    );
 
-const finalRisk =
-riskScore + behaviorRisk;
-        await updateTrustScore(
-    client,
-    sender.rows[0].user_id,
-    finalRisk
-);
+    const finalRisk = riskScore + behaviorRisk;
+    await updateTrustScore(client, sender.rows[0].user_id, finalRisk);
 
-        const transaction =
-            await client.query(
-                `
+    const transaction = await client.query(
+      `
                 INSERT INTO transactions
                 (
                     sender_account_id,
@@ -140,21 +92,21 @@ riskScore + behaviorRisk;
                 )
                 RETURNING *
                 `,
-                [
-                    sender.rows[0].id,
-                    receiver.rows[0].id,
-                    amount,
-                    "SUCCESS",
-                    transactionRef,
-                    finalRisk,remark
-                ]
-            );
-            console.log("riskScore =", riskScore);
-            console.log("behaviorRisk =", behaviorRisk);
-            console.log("finalRisk =", finalRisk);
-            if(finalRisk > 70){
-
-    await client.query(
+      [
+        sender.rows[0].id,
+        receiver.rows[0].id,
+        amount,
+        "SUCCESS",
+        transactionRef,
+        finalRisk,
+        remark,
+      ],
+    );
+    console.log("riskScore =", riskScore);
+    console.log("behaviorRisk =", behaviorRisk);
+    console.log("finalRisk =", finalRisk);
+    if (finalRisk > 70) {
+      await client.query(
         `
         INSERT INTO fraud_alerts
         (
@@ -171,52 +123,32 @@ riskScore + behaviorRisk;
             $4
         )
         `,
-        [
-            transaction.rows[0].id,
-            "Large Transaction",
-            "HIGH",
-            finalRisk
-        ]
-    );
-
-}
-
-        await client.query("COMMIT");
-
-        res.status(200).json({
-            success:true,
-            transaction:
-            transaction.rows[0]
-        });
-
-    } catch(error){
-
-        await client.query(
-            "ROLLBACK"
-        );
-
-        res.status(400).json({
-            message:error.message
-        });
-
-    } finally {
-
-        client.release();
-
+        [transaction.rows[0].id, "Large Transaction", "HIGH", finalRisk],
+      );
     }
 
+    await client.query("COMMIT");
+
+    res.status(200).json({
+      success: true,
+      transaction: transaction.rows[0],
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    res.status(400).json({
+      message: error.message,
+    });
+  } finally {
+    client.release();
+  }
 };
-const getTransactionHistory =
-async (req,res)=>{
+const getTransactionHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
- try{
-
-  const userId =
-  req.user.id;
-
-  const result =
-  await pool.query(
-  `
+    const result = await pool.query(
+      `
   SELECT
 
  t.id,
@@ -254,39 +186,26 @@ WHERE
 
 ORDER BY t.created_at DESC
   `,
-  [userId]
-  );
-  
+      [userId],
+    );
 
-  res.status(200).json({
-    
+    res.status(200).json({
+      success: true,
 
-   success:true,
-
-   transactions:
-   result.rows
-   
-
-  });
-
- }catch(error){
+      transactions: result.rows,
+    });
+  } catch (error) {
     console.log(error);
 
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getAllTransactions =
-async(req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getAllTransactions = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
 
    t.id,
@@ -319,38 +238,26 @@ async(req,res)=>{
 
   ORDER BY
   t.created_at DESC
-  `
-  );
+  `,
+    );
 
-  res.status(200).json({
+    res.status(200).json({
+      success: true,
 
-   success:true,
-
-   transactions:
-   result.rows
-
-  });
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+      transactions: result.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getRecentRecipients =
-async(req,res)=>{
+const getRecentRecipients = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
- try{
-
-  const userId =
-  req.user.id;
-
-  const result =
-  await pool.query(
-  `
+    const result = await pool.query(
+      `
   SELECT DISTINCT ON(a.account_number)
 
    a.account_number,
@@ -382,27 +289,22 @@ async(req,res)=>{
 
   LIMIT 5
   `,
-  [userId]
-  );
+      [userId],
+    );
 
-  res.json({
-   recipients:
-   result.rows
-  });
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.json({
+      recipients: result.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
-    transferMoney,
-    getTransactionHistory,
-    getAllTransactions,
-    getRecentRecipients
+  transferMoney,
+  getTransactionHistory,
+  getAllTransactions,
+  getRecentRecipients,
 };

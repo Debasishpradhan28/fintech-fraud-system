@@ -4,25 +4,16 @@ async (
  userId,
  riskScore
 ) => {
-
  let scoreChange = 0;
-
  if(riskScore < 30){
-
   scoreChange = 5;
-
  }
  else if(riskScore < 70){
-
   scoreChange = -10;
-
  }
  else{
-
   scoreChange = -25;
-
  }
-
  const trust =
  await client.query(
  `
@@ -32,10 +23,9 @@ async (
  `,
  [userId]
  );
-
  const currentScore =
  trust.rows[0]?.score || 500;
-
+ 
  const newScore =
  Math.max(
   0,

@@ -4,15 +4,12 @@ const pool = require("../config/db");
 // Grant Analyst Access
 // ===============================
 
-const grantAnalyst = async(req,res)=>{
+const grantAnalyst = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-try{
-
-const {email}=req.body;
-
-const user=await pool.query(
-
-`
+    const user = await pool.query(
+      `
 SELECT
 id,
 full_name,
@@ -22,150 +19,100 @@ FROM users
 WHERE LOWER(email)=LOWER($1)
 `,
 
-[email]
+      [email],
+    );
 
-);
+    if (user.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
 
-if(user.rows.length===0){
+        message: "User not found.",
+      });
+    }
 
-return res.status(404).json({
+    if (user.rows[0].role === "ADMIN") {
+      return res.status(400).json({
+        success: false,
 
-success:false,
+        message: "Cannot change Admin role.",
+      });
+    }
 
-message:"User not found."
+    if (user.rows[0].role === "ANALYST") {
+      return res.status(400).json({
+        success: false,
 
-});
+        message: "User is already an analyst.",
+      });
+    }
 
-}
-
-if(user.rows[0].role==="ADMIN"){
-
-return res.status(400).json({
-
-success:false,
-
-message:"Cannot change Admin role."
-
-});
-
-}
-
-if(user.rows[0].role==="ANALYST"){
-
-return res.status(400).json({
-
-success:false,
-
-message:"User is already an analyst."
-
-});
-
-}
-
-await pool.query(
-
-`
+    await pool.query(
+      `
 UPDATE users
 SET role='ANALYST'
 WHERE id=$1
 `,
 
-[user.rows[0].id]
+      [user.rows[0].id],
+    );
 
-);
+    res.json({
+      success: true,
 
-res.json({
+      message: "Analyst access granted.",
+    });
+  } catch (err) {
+    console.log(err);
 
-success:true,
+    res.status(500).json({
+      success: false,
 
-message:"Analyst access granted."
-
-});
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-success:false,
-
-message:"Server Error"
-
-});
-
-}
-
+      message: "Server Error",
+    });
+  }
 };
-const getAdminStats = async(req,res)=>{
+const getAdminStats = async (req, res) => {
+  try {
+    const totalUsers = await pool.query(`SELECT COUNT(*) FROM users`);
 
-try{
+    const analysts = await pool.query(
+      `SELECT COUNT(*) FROM users WHERE role='ANALYST'`,
+    );
 
-const totalUsers=await pool.query(
+    const admins = await pool.query(
+      `SELECT COUNT(*) FROM users WHERE role='ADMIN'`,
+    );
 
-`SELECT COUNT(*) FROM users`
+    res.json({
+      success: true,
 
-);
+      stats: {
+        users: Number(totalUsers.rows[0].count),
 
-const analysts=await pool.query(
+        analysts: Number(analysts.rows[0].count),
 
-`SELECT COUNT(*) FROM users WHERE role='ANALYST'`
+        admins: Number(admins.rows[0].count),
+      },
+    });
+  } catch (err) {
+    console.log(err);
 
-);
+    res.status(500).json({
+      success: false,
 
-const admins=await pool.query(
-
-`SELECT COUNT(*) FROM users WHERE role='ADMIN'`
-
-);
-
-res.json({
-
-success:true,
-
-stats:{
-
-users:Number(totalUsers.rows[0].count),
-
-analysts:Number(analysts.rows[0].count),
-
-admins:Number(admins.rows[0].count)
-
-}
-
-});
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-success:false,
-
-message:"Server Error"
-
-});
-
-}
-
+      message: "Server Error",
+    });
+  }
 };
 
 // ===============================
 // Get All Analysts
 // ===============================
 
-const getAnalysts = async(req,res)=>{
-
-    try{
-
-        const result=await pool.query(
-
-            `
+const getAnalysts = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
             SELECT
             id,
             full_name,
@@ -173,118 +120,82 @@ const getAnalysts = async(req,res)=>{
             FROM users
             WHERE role='ANALYST'
             ORDER BY full_name
-            `
+            `,
+    );
 
-        );
+    res.json(result.rows);
+  } catch (err) {
+    console.log(err);
 
-        res.json(result.rows);
-
-    }
-
-    catch(err){
-
-        console.log(err);
-
-        res.status(500).json({
-
-            success:false
-
-        });
-
-    }
-
+    res.status(500).json({
+      success: false,
+    });
+  }
 };
 
 // ===============================
 // Remove Analyst
 // ===============================
 
-const removeAnalyst=async(req,res)=>{
+const removeAnalyst = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-try{
-
-const {id}=req.params;
-
-const user=await pool.query(
-
-`
+    const user = await pool.query(
+      `
 SELECT role
 FROM users
 WHERE id=$1
 `,
 
-[id]
+      [id],
+    );
 
-);
+    if (user.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
 
-if(user.rows.length===0){
+        message: "User not found.",
+      });
+    }
 
-return res.status(404).json({
+    if (user.rows[0].role !== "ANALYST") {
+      return res.status(400).json({
+        success: false,
 
-success:false,
+        message: "User is not an analyst.",
+      });
+    }
 
-message:"User not found."
-
-});
-
-}
-
-if(user.rows[0].role!=="ANALYST"){
-
-return res.status(400).json({
-
-success:false,
-
-message:"User is not an analyst."
-
-});
-
-}
-
-await pool.query(
-
-`
+    await pool.query(
+      `
 UPDATE users
 SET role='CUSTOMER'
 WHERE id=$1
 `,
 
-[id]
+      [id],
+    );
 
-);
+    res.json({
+      success: true,
 
-res.json({
+      message: "Analyst removed.",
+    });
+  } catch (err) {
+    console.log(err);
 
-success:true,
-
-message:"Analyst removed."
-
-});
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-success:false
-
-});
-
-}
-
+    res.status(500).json({
+      success: false,
+    });
+  }
 };
-const getUserByEmail = async (req,res)=>{
+const getUserByEmail = async (req, res) => {
+  try {
+    const { email } = req.params;
 
-    try{
-
-        const {email}=req.params;
-
-        const result = await pool.query(
-
-            `
+    const result = await pool.query(
+      `
             SELECT
 
             id,
@@ -297,62 +208,42 @@ const getUserByEmail = async (req,res)=>{
             WHERE LOWER(email)=LOWER($1)
             `,
 
-            [email]
+      [email],
+    );
 
-        );
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
 
-        if(result.rows.length===0){
-
-            return res.status(404).json({
-
-                success:false,
-
-                message:"User not found."
-
-            });
-
-        }
-
-        res.json({
-
-            success:true,
-
-            user:result.rows[0]
-
-        });
-
+        message: "User not found.",
+      });
     }
 
-    catch(err){
+    res.json({
+      success: true,
 
-        console.log(err);
+      user: result.rows[0],
+    });
+  } catch (err) {
+    console.log(err);
 
-        res.status(500).json({
+    res.status(500).json({
+      success: false,
 
-            success:false,
-
-            message:"Server Error"
-
-        });
-
-    }
-
+      message: "Server Error",
+    });
+  }
 };
 const searchUsers = async (req, res) => {
+  try {
+    const { query } = req.query;
 
-    try {
+    if (!query) {
+      return res.json([]);
+    }
 
-        const { query } = req.query;
-
-        if (!query) {
-
-            return res.json([]);
-
-        }
-
-        const result = await pool.query(
-
-            `
+    const result = await pool.query(
+      `
             SELECT
                 id,
                 full_name,
@@ -366,37 +257,26 @@ const searchUsers = async (req, res) => {
             LIMIT 8
             `,
 
-            [`%${query}%`]
+      [`%${query}%`],
+    );
 
-        );
+    res.json(result.rows);
+  } catch (err) {
+    console.log(err);
 
-        res.json(result.rows);
-
-    }
-
-    catch(err){
-
-        console.log(err);
-
-        res.status(500).json({
-
-            success:false
-
-        });
-
-    }
-
+    res.status(500).json({
+      success: false,
+    });
+  }
 };
 
-module.exports={
+module.exports = {
+  grantAnalyst,
 
-grantAnalyst,
+  getAnalysts,
 
-getAnalysts,
-
-removeAnalyst,
-getUserByEmail,
-getAdminStats,
-searchUsers
-
+  removeAnalyst,
+  getUserByEmail,
+  getAdminStats,
+  searchUsers,
 };

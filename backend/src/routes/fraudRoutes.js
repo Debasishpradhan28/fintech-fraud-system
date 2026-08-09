@@ -4,9 +4,7 @@ const router = express.Router();
 const auth = require("../middleware/authMiddleware");
 const verifyToken =require("../middleware/authMiddleware");
 const requireAnalyst = require("../middleware/analystMiddleware");
-
 const {
-
     getHighRiskTransactions,
     getFraudAlerts,
     getRiskyUsers,
@@ -18,9 +16,7 @@ const {
     getUserRiskTimeline,
     getInvestigationQueue,
     getInvestigationTimeline
-}
-=
-require("../controllers/fraudController");
+}=require("../controllers/fraudController");
 
 router.get(
     "/high-risk",

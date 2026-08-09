@@ -3,13 +3,11 @@ const express = require("express");
 const router = express.Router();
 
 const {
-
  getRiskDistribution,
  getTransactionTrends,
  getTrustDistribution,
  getFraudTrend,
  getTopRiskUsers
-
 } = require(
  "../controllers/analyticsController"
 );
@@ -20,13 +18,11 @@ router.get(
     verifyToken,
     requireAnalyst,
     (req, res) => {
-
         res.json({
             success: true,
             role: req.user.role,
             message: "Access Granted"
         });
-
     }
 );
 router.get(

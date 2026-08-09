@@ -20,10 +20,10 @@ const pool = isProduction
 
 pool.connect()
   .then(() => {
-    console.log("✅ PostgreSQL Connected");
+    console.log("PostgreSQL Connected");
   })
   .catch((err) => {
-    console.error("❌ Database Error");
+    console.error("Database Error");
     console.error(err);
   });
 

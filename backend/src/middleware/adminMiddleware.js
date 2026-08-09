@@ -6,7 +6,6 @@ const requireAdmin = (req, res, next) => {
             message: "Unauthorized"
         });
     }
-
     if (req.user.role !== "ADMIN") {
 
         return res.status(403).json({
@@ -15,9 +14,7 @@ const requireAdmin = (req, res, next) => {
         });
 
     }
-
     next();
-
 };
 
 module.exports = requireAdmin;

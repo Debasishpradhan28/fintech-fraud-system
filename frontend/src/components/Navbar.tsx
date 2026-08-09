@@ -1,15 +1,11 @@
 function Navbar() {
 
   const handleLogout = () => {
-
     localStorage.removeItem("token");
-
     window.location.href = "/";
-
   };
 
   return (
-
     <div className="
       bg-white
       rounded-2xl
@@ -20,20 +16,16 @@ function Navbar() {
       justify-between
       items-center
     ">
-
       <div>
-
         <h2 className="
           text-2xl
           font-bold
         ">
           Dashboard
         </h2>
-
         <p className="text-slate-500">
           Monitor fraud activity in real-time
         </p>
-
       </div>
 
       <button
@@ -49,11 +41,8 @@ function Navbar() {
       >
         Logout
       </button>
-
     </div>
-
   );
-
 }
 
 export default Navbar;

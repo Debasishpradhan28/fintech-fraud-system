@@ -2,16 +2,14 @@ const express = require("express");
 
 const router = express.Router();
 
-const verifyToken =
-require("../middleware/authMiddleware");
+const verifyToken = require("../middleware/authMiddleware");
 
 const {
     transferMoney,
     getTransactionHistory,
     getAllTransactions,
     getRecentRecipients
-} =
-require("../controllers/transactionController");
+} = require("../controllers/transactionController");
 
 router.post(
     "/transfer",

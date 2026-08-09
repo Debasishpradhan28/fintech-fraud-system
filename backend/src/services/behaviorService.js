@@ -5,9 +5,7 @@ async (
     deviceFingerprint,
     location
 ) => {
-
     let risk = 0;
-
     const knownDevice =
     await client.query(
     `
@@ -21,11 +19,9 @@ async (
         deviceFingerprint
     ]
     );
-
     if(knownDevice.rows.length === 0){
         risk += 30;
     }
-
     const knownLocation =
     await client.query(
     `
@@ -39,18 +35,14 @@ async (
         location
     ]
     );
-
     if(knownLocation.rows.length === 0){
         risk += 20;
     }
-
-    const hour =
-        new Date().getHours();
+    const hour = new Date().getHours();
 
     if(hour >= 1 && hour <= 5){
         risk += 15;
     }
-
     return risk;
 
 };

@@ -1,17 +1,11 @@
-const pool =
-require("../config/db");
+const pool = require("../config/db");
 
-const getDashboardData =
-async(req,res)=>{
+const getDashboardData = async (req, res) => {
+  try {
+    const userId = req.user.id;
 
- try{
-
-  const userId =
-  req.user.id;
-
-  const user =
-  await pool.query(
-  `
+    const user = await pool.query(
+      `
   SELECT
    u.full_name,
    a.account_number,
@@ -27,23 +21,17 @@ async(req,res)=>{
 
   WHERE u.id = $1
   `,
-  [userId]
-  );
+      [userId],
+    );
 
-  res.status(200).json(
-   user.rows[0]
-  );
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.status(200).json(user.rows[0]);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
- getDashboardData
+  getDashboardData,
 };

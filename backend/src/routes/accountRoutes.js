@@ -1,18 +1,9 @@
 const express = require("express");
-
 const router = express.Router();
 
-const verifyToken =
-    require("../middleware/authMiddleware");
+const verifyToken = require("../middleware/authMiddleware");
+const {createAccount} = require("../controllers/accountController");
 
-const {
-    createAccount
-} = require("../controllers/accountController");
-
-router.post(
-    "/create",
-    verifyToken,
-    createAccount
-);
+router.post( "/create",verifyToken,createAccount);
 
 module.exports = router;

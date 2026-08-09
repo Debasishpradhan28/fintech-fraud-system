@@ -1,75 +1,55 @@
 const pool = require("../config/db");
 
-const getHighRiskTransactions =
-async (req,res) => {
-
-    try {
-
-        const result =
-        await pool.query(
-        `
+const getHighRiskTransactions = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
         SELECT *
         FROM transactions
         WHERE risk_score >= 70
         ORDER BY created_at DESC
-        `
-        );
+        `,
+    );
 
-        res.status(200).json({
-            success:true,
-            count:result.rows.length,
-            transactions:result.rows
-        });
+    res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      transactions: result.rows,
+    });
+  } catch (error) {
+    console.error(error);
 
-    } catch(error){
-
-        console.error(error);
-
-        res.status(500).json({
-            message:"Server Error"
-        });
-
-    }
-
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
 };
-const getFraudAlerts =
-async (req,res) => {
-
-    try {
-
-        const result =
-        await pool.query(
-        `
+const getFraudAlerts = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
         SELECT *
         FROM fraud_alerts
         ORDER BY created_at DESC
-        `
-        );
+        `,
+    );
 
-        res.status(200).json({
-            success:true,
-            alerts:result.rows
-        });
+    res.status(200).json({
+      success: true,
+      alerts: result.rows,
+    });
+  } catch (error) {
+    console.error(error);
 
-    } catch(error){
-
-        console.error(error);
-
-        res.status(500).json({
-            message:"Server Error"
-        });
-
-    }
-
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
 };
-const getRiskyUsers =
-async (req,res) => {
-
-    try {
-
-        const result =
-        await pool.query(
-        `
+const getRiskyUsers = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
         SELECT
             u.id,
             u.full_name,
@@ -79,102 +59,75 @@ async (req,res) => {
         JOIN trust_scores ts
         ON u.id = ts.user_id
         ORDER BY ts.score ASC
-        `
-        );
+        `,
+    );
 
-        res.status(200).json({
-            success:true,
-            users:result.rows
-        });
+    res.status(200).json({
+      success: true,
+      users: result.rows,
+    });
+  } catch (error) {
+    console.error(error);
 
-    } catch(error){
-
-        console.error(error);
-
-        res.status(500).json({
-            message:"Server Error"
-        });
-
-    }
-
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
 };
-const getFraudSummary =
-async (req,res) => {
-
-    try {
-
-        const totalTransactions =
-        await pool.query(
-        `
+const getFraudSummary = async (req, res) => {
+  try {
+    const totalTransactions = await pool.query(
+      `
         SELECT COUNT(*)
         FROM transactions
-        `
-        );
+        `,
+    );
 
-        const highRiskTransactions =
-        await pool.query(
-        `
+    const highRiskTransactions = await pool.query(
+      `
         SELECT COUNT(*)
         FROM transactions
         WHERE risk_score >= 70
-        `
-        );
+        `,
+    );
 
-        const fraudAlerts =
-        await pool.query(
-        `
+    const fraudAlerts = await pool.query(
+      `
         SELECT COUNT(*)
         FROM fraud_alerts
-        `
-        );
+        `,
+    );
 
-        const avgTrust =
-        await pool.query(
-        `
+    const avgTrust = await pool.query(
+      `
         SELECT AVG(score)
         FROM trust_scores
-        `
-        );
+        `,
+    );
 
-        res.status(200).json({
+    res.status(200).json({
+      totalTransactions: totalTransactions.rows[0].count,
 
-            totalTransactions:
-            totalTransactions.rows[0].count,
+      highRiskTransactions: highRiskTransactions.rows[0].count,
 
-            highRiskTransactions:
-            highRiskTransactions.rows[0].count,
+      fraudAlerts: fraudAlerts.rows[0].count,
 
-            fraudAlerts:
-            fraudAlerts.rows[0].count,
+      averageTrustScore: Number(avgTrust.rows[0].avg).toFixed(2),
+    });
+  } catch (error) {
+    console.error(error);
 
-            averageTrustScore:
-            Number(
-                avgTrust.rows[0].avg
-            ).toFixed(2)
-
-        });
-
-    } catch(error){
-
-        console.error(error);
-
-        res.status(500).json({
-            message:"Server Error"
-        });
-
-    }
-
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
 };
-const getInvestigationDetails =
-async (req,res)=>{
+const getInvestigationDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
 
- try{
-
-  const { id } = req.params;
-
-  const result =
-  await pool.query(
-  `
+    const result = await pool.query(
+      `
   SELECT
 
    fa.id,
@@ -217,64 +170,52 @@ async (req,res)=>{
 
   LIMIT 1
   `,
-  [id]
-  );
+      [id],
+    );
 
-  if(result.rows.length===0){
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: "Alert not found",
+      });
+    }
 
-   return res.status(404).json({
-    message:"Alert not found"
-   });
+    const details = result.rows[0];
 
+    details.risk_breakdown = [];
+
+    if (details.amount >= 50000) {
+      details.risk_breakdown.push({
+        title: "Large Transaction",
+        description: `Amount ₹${details.amount} exceeds ₹50,000 threshold`,
+        score: 100,
+        severity: "HIGH",
+      });
+    }
+
+    if (details.risk_score > 100) {
+      details.risk_breakdown.push({
+        title: "Behavior Anomaly",
+        description: "Unusual transaction behavior detected",
+        score: details.risk_score - 100,
+        severity: "MEDIUM",
+      });
+    }
+
+    res.status(200).json(details);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
   }
-
- const details = result.rows[0];
-
- details.risk_breakdown = [];
-
- if(details.amount >= 50000){
-
-   details.risk_breakdown.push({
-   title:"Large Transaction",
-   description: `Amount ₹${details.amount} exceeds ₹50,000 threshold`,
-   score:100,
-   severity:"HIGH"
- });
-}
-
-if(details.risk_score > 100){
-
- details.risk_breakdown.push({
-  title:"Behavior Anomaly",
-  description: "Unusual transaction behavior detected",
-  score: details.risk_score - 100,
-  severity:"MEDIUM"
- });
-
-}
-
- res.status(200).json(details);
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
 };
-const updateAlertStatus =
-async (req,res)=>{
+const updateAlertStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
 
- try{
+    const { status, notes } = req.body;
 
-  const { id } = req.params;
-
-  const { status, notes } = req.body;
-
-  await pool.query(
-`
+    await pool.query(
+      `
 UPDATE fraud_alerts
 SET
 
@@ -285,26 +226,20 @@ SET
 
 WHERE id = $3
 `,
-[
- status,
- notes,
- id
-]
-);
-if(status === "RESOLVED"){
-
- await pool.query(
- `
+      [status, notes, id],
+    );
+    if (status === "RESOLVED") {
+      await pool.query(
+        `
  UPDATE fraud_alerts
  SET updated_at = NOW()
  WHERE id = $1
  `,
- [id]
- );
-
-}
-await pool.query(
-`
+        [id],
+      );
+    }
+    await pool.query(
+      `
 INSERT INTO investigation_history
 (
  alert_id,
@@ -318,16 +253,11 @@ VALUES
  $3
 )
 `,
-[
- id,
- `Status changed to ${status}`,
- req.user.email
-]
-);
-if(notes){
-
- await pool.query(
- `
+      [id, `Status changed to ${status}`, req.user.email],
+    );
+    if (notes) {
+      await pool.query(
+        `
  INSERT INTO investigation_history
  (
   alert_id,
@@ -341,75 +271,51 @@ if(notes){
   $3
  )
  `,
- [
-  id,
-  "Analyst note updated",
-  req.user.email
- ]
- );
+        [id, "Analyst note updated", req.user.email],
+      );
+    }
 
-}
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    console.error("UPDATE ALERT ERROR:", error);
 
-  res.status(200).json({
-   success:true
-  });
-
- }catch(error){
-    console.error(
-   "UPDATE ALERT ERROR:",
-   error
-  );
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getInvestigationTimeline =
-async(req,res)=>{
+const getInvestigationTimeline = async (req, res) => {
+  try {
+    const { id } = req.params;
 
- try{
-
-  const { id } =
-  req.params;
-
-  const result =
-  await pool.query(
-  `
+    const result = await pool.query(
+      `
   SELECT *
   FROM investigation_history
   WHERE alert_id = $1
   ORDER BY created_at DESC
   `,
-  [id]
-  );
+      [id],
+    );
 
-  res.status(200).json({
-   history:
-   result.rows
-  });
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.status(200).json({
+      history: result.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getInvestigationNetwork =
-async (req,res)=>{
-    const { id } = req.params;
-console.log("API HIT");
-console.log("Requested ID:", id);
- try{
-const investigation =
-await pool.query(
-    
-`
+const getInvestigationNetwork = async (req, res) => {
+  const { id } = req.params;
+  console.log("API HIT");
+  console.log("Requested ID:", id);
+  try {
+    const investigation = await pool.query(
+      `
 SELECT
 
 fa.id,
@@ -432,23 +338,20 @@ ON fa.transaction_id=t.id
 
 WHERE fa.id=$1
 `,
-[id]
-);
-console.log("Investigation Rows:");
-console.log(investigation.rows);
-if (investigation.rows.length === 0) {
-
-    return res.status(404).json({
+      [id],
+    );
+    console.log("Investigation Rows:");
+    console.log(investigation.rows);
+    if (investigation.rows.length === 0) {
+      return res.status(404).json({
         success: false,
         message: "Investigation not found",
-        investigationId: id
-    });
-
-}
-const mainAccountId =investigation.rows[0].sender_account_id;
-  const result =
-  await pool.query(
-  `
+        investigationId: id,
+      });
+    }
+    const mainAccountId = investigation.rows[0].sender_account_id;
+    const result = await pool.query(
+      `
   SELECT
 
    t.id,
@@ -482,18 +385,17 @@ const mainAccountId =investigation.rows[0].sender_account_id;
 
   LIMIT 20
   `,
-  [mainAccountId]
-  );
-  console.log("Network Transactions:");
-console.table(result.rows);
+      [mainAccountId],
+    );
+    console.log("Network Transactions:");
+    console.table(result.rows);
 
-const patterns=[];
-const recommendations=[];
-const aiSummary="AI analysis not generated yet.";
+    const patterns = [];
+    const recommendations = [];
+    const aiSummary = "AI analysis not generated yet.";
 
-const accountInfo =
-await pool.query(
-`
+    const accountInfo = await pool.query(
+      `
 SELECT
 
 a.id,
@@ -566,163 +468,114 @@ a.id,
 
 ts.score
 `,
-[
-mainAccountId
-]
-);
-if (accountInfo.rows.length === 0) {
-    return res.status(404).json({
+      [mainAccountId],
+    );
+    if (accountInfo.rows.length === 0) {
+      return res.status(404).json({
         success: false,
-        message: "Account not found"
+        message: "Account not found",
+      });
+    }
+    const mainAccountNumber = accountInfo.rows[0].account_number;
+    const nodes = new Map();
+
+    result.rows.forEach((txn) => {
+      if (!nodes.has(txn.sender_account)) {
+        nodes.set(txn.sender_account, {
+          id: txn.sender_account,
+          label: txn.sender_account,
+          type: txn.sender_account === mainAccountNumber ? "MAIN" : "CONNECTED",
+
+          riskScore: txn.risk_score,
+        });
+      }
+
+      if (!nodes.has(txn.receiver_account)) {
+        nodes.set(txn.receiver_account, {
+          id: txn.receiver_account,
+          label: txn.receiver_account,
+          type:
+            txn.receiver_account === mainAccountNumber ? "MAIN" : "CONNECTED",
+
+          riskScore: txn.risk_score,
+        });
+      }
     });
-}
-const mainAccountNumber = accountInfo.rows[0].account_number;
-const nodes = new Map();
+    const edges = result.rows.map((txn) => ({
+      id: `edge-${txn.id}`,
 
-result.rows.forEach((txn)=>{
+      source: txn.sender_account,
 
- if(!nodes.has(txn.sender_account)){
+      target: txn.receiver_account,
 
-  nodes.set(
-  txn.sender_account,
-  {
-    id: txn.sender_account,
-    label: txn.sender_account,
-    type:
-      txn.sender_account === mainAccountNumber
-        ? "MAIN"
-        : "CONNECTED",
+      amount: txn.amount,
 
-    riskScore: txn.risk_score
-  }
-);
+      risk: txn.risk_score,
 
- }
+      created_at: txn.created_at,
+    }));
+    const metrics = {
+      totalAccounts: nodes.size,
 
- if(!nodes.has(txn.receiver_account)){
+      totalTransactions: result.rows.length,
 
-  nodes.set(
-  txn.receiver_account,
-  {
-    id: txn.receiver_account,
-    label: txn.receiver_account,
-    type:
-      txn.receiver_account === mainAccountNumber
-        ? "MAIN"
-        : "CONNECTED",
+      totalAmount: result.rows.reduce(
+        (sum, txn) => sum + Number(txn.amount),
 
-    riskScore: txn.risk_score
-  }
-);
+        0,
+      ),
 
- }
+      highRiskTransactions: result.rows.filter((txn) => txn.risk_score >= 100)
+        .length,
+    };
+    const timeline = result.rows.map((txn) => ({
+      id: txn.id,
 
-});
-const edges = result.rows.map(txn=>({
-
- id: `edge-${txn.id}`,
-
- source: txn.sender_account,
-
- target: txn.receiver_account,
-
- amount: txn.amount,
-
- risk: txn.risk_score,
-
- created_at: txn.created_at
-
-}));
-const metrics={
-
- totalAccounts: nodes.size,
-
- totalTransactions: result.rows.length,
-
- totalAmount: result.rows.reduce(
-
- (sum,txn)=>
-
- sum+Number(txn.amount),
-
- 0
-
- ),
-
- highRiskTransactions:
-
- result.rows.filter(
-
- txn=>txn.risk_score>=100
-
- ).length
-
-};
-const timeline =
-result.rows.map(txn=>({
-
- id:txn.id,
-
- title:
-
- `${txn.sender_account}
+      title: `${txn.sender_account}
  → ${txn.receiver_account}`,
 
- description:
+      description: `₹${Number(txn.amount).toLocaleString()}`,
 
- `₹${Number(txn.amount).toLocaleString()}`,
+      risk: txn.risk_score,
 
- risk: txn.risk_score,
+      created_at: txn.created_at,
+    }));
+    res.status(200).json({
+      success: true,
 
- created_at: txn.created_at
+      investigation: investigation.rows[0],
 
-}));
-  res.status(200).json({
+      account: accountInfo.rows[0],
 
- success:true,
+      metrics,
 
- investigation: investigation.rows[0],
+      nodes: [...nodes.values()],
 
- account: accountInfo.rows[0],
+      edges,
 
- metrics,
+      timeline,
 
- nodes:
- [...nodes.values()],
+      patterns,
 
- edges,
+      recommendations,
 
- timeline,
-
- patterns,
-
- recommendations,
-
- aiSummary
-
-});
-
- }catch(error){
-  console.error(error);
-  res.status(500).json({
-    success : false,
-   message:error.message,
-   stack : error.stack
-  });
-
- }
-
+      aiSummary,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      stack: error.stack,
+    });
+  }
 };
-const getAccountIntelligence =
-async (req,res)=>{
+const getAccountIntelligence = async (req, res) => {
+  try {
+    const { accountId } = req.params;
 
- try{
-
-  const { accountId } = req.params;
-
-  const result =
-  await pool.query(
-  `
+    const result = await pool.query(
+      `
   SELECT
 
    a.account_number,
@@ -780,55 +633,36 @@ async (req,res)=>{
    a.account_number,
    ts.score
   `,
-  [accountId]
-  );
+      [accountId],
+    );
 
-  const data =
-  result.rows[0];
+    const data = result.rows[0];
 
-  let riskLevel = "LOW";
+    let riskLevel = "LOW";
 
-  if(data.trust_score < 450){
+    if (data.trust_score < 450) {
+      riskLevel = "HIGH";
+    } else if (data.trust_score < 500) {
+      riskLevel = "MEDIUM";
+    }
 
-   riskLevel = "HIGH";
+    res.status(200).json({
+      ...data,
 
+      risk_level: riskLevel,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
   }
-  else if(
-   data.trust_score < 500
-  ){
-
-   riskLevel = "MEDIUM";
-
-  }
-
-  res.status(200).json({
-
-   ...data,
-
-   risk_level:riskLevel
-
-  });
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
 };
-const getUserRiskTimeline =
-async (req,res)=>{
+const getUserRiskTimeline = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
- try{
-
-  const { userId } =
-  req.params;
-
-  const result =
-  await pool.query(
-  `
+    const result = await pool.query(
+      `
   SELECT
    score,
    reason,
@@ -838,31 +672,23 @@ async (req,res)=>{
   ORDER BY created_at DESC
   LIMIT 20
   `,
-  [userId]
-  );
+      [userId],
+    );
 
-  res.status(200).json({
-   success:true,
-   history:result.rows
-  });
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.status(200).json({
+      success: true,
+      history: result.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
-const getInvestigationQueue =
-async (req,res)=>{
-
- try{
-
-  const result =
-  await pool.query(
-  `
+const getInvestigationQueue = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `
   SELECT
 
    fa.id,
@@ -904,32 +730,28 @@ async (req,res)=>{
 
    fa.risk_score DESC
 
-  `
-  );
+  `,
+    );
 
-  res.status(200).json({
-   alerts:result.rows
-  });
-
- }catch(error){
-
-  res.status(500).json({
-   message:error.message
-  });
-
- }
-
+    res.status(200).json({
+      alerts: result.rows,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 module.exports = {
-    getHighRiskTransactions,
-    getFraudAlerts,
-    getRiskyUsers,
-    getFraudSummary,
-    getInvestigationDetails,
-    updateAlertStatus,
-    getInvestigationNetwork,
-    getAccountIntelligence,
-    getUserRiskTimeline,
-    getInvestigationQueue,
-    getInvestigationTimeline
+  getHighRiskTransactions,
+  getFraudAlerts,
+  getRiskyUsers,
+  getFraudSummary,
+  getInvestigationDetails,
+  updateAlertStatus,
+  getInvestigationNetwork,
+  getAccountIntelligence,
+  getUserRiskTimeline,
+  getInvestigationQueue,
+  getInvestigationTimeline,
 };

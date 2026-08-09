@@ -38,11 +38,7 @@ export default function AnalyticsCharts({
   
   return (
     <div className="space-y-6">
-      
-      {/* Top Row: Graphs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Fraud Transaction Velocity (Replaced LineChart with AreaChart) */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-slate-800">Fraud Alerts Velocity</h2>
@@ -75,7 +71,6 @@ export default function AnalyticsCharts({
           </ResponsiveContainer>
         </div>
 
-        {/* Risk Distribution Pie Chart */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
           <h2 className="text-lg font-bold text-slate-800 mb-6">System Risk Distribution</h2>
           
@@ -92,7 +87,6 @@ export default function AnalyticsCharts({
                 paddingAngle={5}
                 label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
               >
-                {/* Dynamically assign colors to the slices using Cell */}
                 {riskData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={getRiskColor(entry.risk_level)} />
                 ))}
@@ -106,7 +100,6 @@ export default function AnalyticsCharts({
         </div>
       </div>
 
-      {/* Bottom Row: Top Suspicious Accounts List */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg font-bold text-slate-800">High-Risk Watchlist</h2>

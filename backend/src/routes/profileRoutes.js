@@ -4,8 +4,6 @@ const router = express.Router();
 const auth =require("../middleware/authMiddleware");
 const verifyToken = require("../middleware/authMiddleware");
 const authMiddleware = require("../middleware/authMiddleware");
-
-
 const {
  getProfile,
  getBanking,
@@ -13,9 +11,7 @@ const {
  updateProfile,
  changePassword,
  markNotificationsRead
-}
-=
-require("../controllers/profileController");
+}=require("../controllers/profileController");
 
 
 router.get(
@@ -44,4 +40,5 @@ router.put(
  changePassword
 );
 router.post('/notifications/clear', authMiddleware, markNotificationsRead);
+
 module.exports = router;

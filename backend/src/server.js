@@ -32,7 +32,7 @@ app.use("/api/deposit", depositRoutes);
 
 app.get("/", (req, res) => {
     res.json({
-        message: "TrustGuard AI Backend Running"
+        message: "TrustGuard - Backend Running"
     });
 });
 
